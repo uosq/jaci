@@ -1,6 +1,6 @@
 # Jaci
 
-Training software for TF2
+Personal Project
 
 (almost) Everything made by me
 
