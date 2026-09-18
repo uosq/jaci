@@ -1,8 +1,8 @@
 # Jaci
 
-Training software for TF2, this is a somewhat continuation of "Skill Issue Linux" as the code for that cheat is just fucking garbage so I had to do everything from scratch
+Training software for TF2
 
-(almost) Everything from scratch
+(almost) Everything made by me
 
 # Building
 
