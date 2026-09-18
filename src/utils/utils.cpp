@@ -211,6 +211,7 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 	return false;
 }
 
+// doesnt work lmao
 void utils::fix_movement(CUserCmd* cmd, const Vec3& cur_angle, const Vec3& target_angle)
 {
 	const float speed = std::hypot(cmd->sidemove, cmd->forwardmove);

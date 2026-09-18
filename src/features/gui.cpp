@@ -2,10 +2,8 @@
 // Created by tevin on 29/06/2026.
 //
 
-#include <cstring>
 #include <dlfcn.h>
 
-#include "backtrack.hpp"
 #include "bind_manager.hpp"
 #include "config.hpp"
 #include "../../thirdparty/imgui/imgui.h"
@@ -13,8 +11,6 @@
 #include "../abstract/igui.hpp"
 
 #include "../interfaces/vgui_surface030.hpp"
-
-#include "../classes/color.hpp"
 
 IGui* create_vulkan_renderer();
 IGui* create_opengl_renderer();
@@ -77,6 +73,9 @@ static void draw_main_window()
 
 		ImGui::Checkbox("Bunny Hop", &config.misc.bhop);
 		ImGui::Checkbox("Fix Movement", &config.fix_movement);
+
+		ImGui::Checkbox("Backtrack", &config.backtrack.enabled);
+		ImGui::SliderInt("Max Ticks", &config.backtrack.max_ticks, 0, 14);
 	}
 	ImGui::End();
 }
@@ -89,7 +88,7 @@ void draw_gui()
 
 	if (is_open) draw_main_window();
 
-	backtrack::debug_draw_records();
+	//backtrack::debug_draw_records();
 }
 
 bool is_gui_open()

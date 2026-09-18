@@ -5,6 +5,9 @@
 #ifndef GUARACI_IHOOKMANAGER_HPP
 #define GUARACI_IHOOKMANAGER_HPP
 #include "../../thirdparty/funchook/funchook.h"
+#include "../../thirdparty/libsigscan/libsigscan.h"
+
+#include "../logging/log.hpp"
 
 class IHookManager
 {

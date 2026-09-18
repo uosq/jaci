@@ -95,6 +95,14 @@ static Vec3 find_visible_point(CPlayer* local, const entity_s& target, const Vec
 
 void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
+	// janky ahh shit
+	Vec3 eye_pos;
+
+	if (CPlayer* player = reinterpret_cast<CPlayer*>(v_client_entity_list()->GetClientEntity(local.index)); player)
+		eye_pos = player->get_eye_pos();
+	else
+		return;
+
 	const auto players = entitylist::get_players();
 
 	if (players.empty())
@@ -105,7 +113,6 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 
 	double closest_fov = std::numeric_limits<double>::max();
 
-	const Vec3 current_pos = local.pos;
 	const Vec3 viewangles = v_engine_client()->GetViewAngles();
 
 	for (auto& player : players)
@@ -116,7 +123,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 		if (player.team == local.team)
 			continue;
 
-		target_angle = current_pos.AngleTo(player.get_center());
+		target_angle = eye_pos.AngleTo(player.get_center());
 
 		if (const double fov = viewangles.GetFovTo(target_angle); static_cast<uint16_t>(fov) < config.aimbot.fov && fov < closest_fov)
 		{

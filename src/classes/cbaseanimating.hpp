@@ -4,8 +4,8 @@
 
 #ifndef JACI_CBASEANIMATING_HPP
 #define JACI_CBASEANIMATING_HPP
-#include <vector>
 
+#include <cstdint>
 #include "cbaseentity.hpp"
 #include "../netvars/netvars.hpp"
 
@@ -37,6 +37,11 @@ public:
 	NETVAR_ARRAY_LIMIT(m_flPoseParameter, "CBaseAnimating", "m_flPoseParameter", float, 24)
 
 	[[nodiscard]] std::array<matrix3x4, 128>& m_CachedBoneData();
+
+	int* m_iMostRecentModelBoneCounter();
+	float* m_flLastBoneSetupTime();
+	static uint64_t get_global_model_bone_counter();
+	void invalidate_bone_cache();
 };
 
 #endif //JACI_CBASEANIMATING_HPP

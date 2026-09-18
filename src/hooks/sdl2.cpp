@@ -44,10 +44,21 @@ INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_Pol
 	}
 
 	if (sdl_window && ImGui::GetCurrentContext())
+	{
 		ImGui_ImplSDL2_ProcessEvent(event);
 
-	if (is_gui_open())
-		event->type = 0;
+		if (is_gui_open())
+		{
+			const ImGuiIO& io = ImGui::GetIO();
+
+			const bool is_key_event = event->type == SDL_KEYDOWN || event->type == SDL_KEYUP;
+			const bool is_mouse_event = event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONDOWN
+						|| event->type == SDL_MOUSEBUTTONUP || event->type == SDL_MOUSEWHEEL;
+			
+			if ((is_key_event && io.WantCaptureKeyboard && event->type != SDL_KEYUP) || (is_mouse_event && io.WantCaptureMouse))
+				event->type = 0;
+		}
+	}
 
 	return ret;
 }

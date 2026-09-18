@@ -18,6 +18,12 @@ struct config_s
 
 	struct
 	{
+		bool enabled = false;
+		int max_ticks = 14;
+	} backtrack;
+
+	struct
+	{
 		bind_s key;
 		int fov = 0;
 	} aimbot;

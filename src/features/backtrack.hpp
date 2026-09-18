@@ -31,6 +31,9 @@ namespace backtrack
 	void set_record(CUserCmd* cmd, const backtrack_record& record);
 	void reset();
 
+	// we shoot the backtrack ourselves
+	void manual_aiming(CUserCmd* cmd, const entity_s& local);
+
 	void debug_draw_records();
 }
 

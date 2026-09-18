@@ -21,7 +21,8 @@
 #include "../features/config.hpp"
 #include "../features/entitylist.hpp"
 #include "../features/misc.hpp"
-#include "../interfaces/vcliententitylist003.hpp"
+#include "../features/backtrack.hpp"
+
 #include "../interfaces/vengineclient014.hpp"
 
 #include "../logging/log.hpp"
@@ -52,6 +53,8 @@ static void CreateMove(const int sequence_number)
 		{
 			aimbot::run(localplayer, weapon, cmd);
 		}
+
+		backtrack::manual_aiming(cmd, localplayer);
 
 		if (config.fix_movement)
 			utils::fix_movement(cmd, cmd->viewangles, copy.viewangles);

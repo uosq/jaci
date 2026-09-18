@@ -38,4 +38,7 @@ public:
 
 	void calc_abs_velocity();
 	Vec3 estimate_abs_velocity();
+	
+	void set_abs_origin(const Vec3& origin);
+	void set_abs_angles(const Vec3& angles);
 };
