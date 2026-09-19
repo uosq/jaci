@@ -1,10 +1,4 @@
-//
-// Created by tevin on 29/06/2026.
-//
-
-#ifndef GUARACI_CGLOBALVARS_HPP
-#define GUARACI_CGLOBALVARS_HPP
-
+#pragma once
 
 struct CGlobalVars
 {
@@ -24,7 +18,3 @@ struct CGlobalVars
 	int nTimestampNetworkingBase;
 	int nTimestampRandomizeWindow;
 };
-
-CGlobalVars* v_global_vars();
-
-#endif //GUARACI_CGLOBALVARS_HPP

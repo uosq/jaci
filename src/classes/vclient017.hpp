@@ -3,10 +3,10 @@
 #include <cstdint>
 #include <sys/cdefs.h>
 
-#include "../classes/createinterface.hpp"
-#include "../classes/datatable.hpp"
-#include "../classes/vector3.hpp"
-#include "../classes/defs.hpp"
+#include "createinterface.hpp"
+#include "datatable.hpp"
+#include "vector3.hpp"
+#include "defs.hpp"
 
 class CGlobalVarsBase;
 class ScreenFade_t;
@@ -253,5 +253,3 @@ class CHLClient : public IBaseClientDLL
 
 	/*CUtlVector< IMaterial * >*/ void *m_CachedMaterials;
 };
-
-CHLClient* v_client();

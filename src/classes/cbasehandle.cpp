@@ -4,9 +4,9 @@
 
 #include "cbasehandle.hpp"
 
-#include "../interfaces/vcliententitylist003.hpp"
+#include "../interfaces/interfaces.hpp"
 
 IHandleEntity* CBaseHandle::Get() const
 {
-	return v_client_entity_list()->GetClientEntityFromHandle(*this);
+	return g_cliententitylist->GetClientEntityFromHandle(*this);
 }

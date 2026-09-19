@@ -8,17 +8,14 @@
 
 #include "logging/log.hpp"
 #include "netvars/netvars.hpp"
-#include "interfaces/vclient017.hpp"
+
+#include "interfaces/interfaces.hpp"
 
 __always_inline static void init()
 {
-	CHLClient* client = nullptr;
-
-	while (true) 
+	while (!initialize_interfaces()) 
 	{
-		client = v_client();
-
-		if (client != nullptr && client->GetAllClasses() != nullptr) 
+		if (g_client && g_client->GetAllClasses())
 			break; 
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -26,9 +23,9 @@ __always_inline static void init()
 
 	// m_netvar_map is empty
 	// wtf??
-	if (!netvars.init(client))
+	if (!netvars.init(g_client))
 	{
-		LOG("netvars()->Init failed! m_netvar_map is empty! WTF");
+		LOG("netvars->init failed! m_netvar_map is empty! WTF");
 		return;
 	}
 

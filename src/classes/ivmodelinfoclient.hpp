@@ -1,12 +1,7 @@
-//
-// Created by tevin on 11/09/2026.
-//
+#pragma once
 
-#ifndef JACI_IVMODELCLIENTINFO_HPP
-#define JACI_IVMODELCLIENTINFO_HPP
-
-#include "../classes/vector3.hpp"
-#include "../classes/ctrace.hpp"
+#include "vector3.hpp"
+#include "ctrace.hpp"
 
 class IMaterial;
 class KeyValues;
@@ -173,7 +168,3 @@ class IVModelInfoClient : public IVModelInfo
 	virtual void OnDynamicModelsStringTableChange(int nStringIndex, const char *pString, const void *pData) = 0;
 	virtual const model_t *FindOrLoadModel(const char *name)						= 0;
 };
-
-IVModelInfoClient* v_model_info_client();
-
-#endif //JACI_IVMODELCLIENTINFO_HPP

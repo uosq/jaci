@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../interfaces/cglobalvars.hpp"
-
 struct model_t;
 struct AudioState_t;
 
@@ -32,7 +30,7 @@ struct engineparms_t
 #define MAX_FRAMETIME	0.1
 #define MIN_FRAMETIME	0.001
 
-#define TICK_INTERVAL		(v_global_vars()->interval_per_tick)
+#define TICK_INTERVAL		(g_globalvars->interval_per_tick)
 #define TIME_TO_TICKS(dt)	(static_cast<int>(0.5f + static_cast<float>(dt) / TICK_INTERVAL))
 #define TICKS_TO_TIME(t)	(TICK_INTERVAL * (t))
 #define ROUND_TO_TICKS(t)	(TICKS_TO_TIME(TIME_TO_TICKS(t)))

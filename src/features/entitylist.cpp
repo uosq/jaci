@@ -8,8 +8,7 @@
 #include "../classes/ctf_player_resource.hpp"
 #include "../classes/ctfplayer.hpp"
 
-#include "../interfaces/vcliententitylist003.hpp"
-#include "../interfaces/vengineclient014.hpp"
+#include "../interfaces/interfaces.hpp"
 #include "../logging/log.hpp"
 
 #include <span>
@@ -75,7 +74,7 @@ static void populate_player_max_and_buffed_health()
 
 static void find_localplayer_entity()
 {
-	const int localplayer_index = v_engine_client()->GetLocalPlayer();
+	const int localplayer_index = g_engineclient->GetLocalPlayer();
 
 	localplayer_entity.index = -1;
 
@@ -93,11 +92,11 @@ void entitylist::update()
 {
 	reset();
 
-	const int max_game_entities = v_client_entity_list()->GetMaxEntities();
+	const int max_game_entities = g_cliententitylist->GetMaxEntities();
 
 	for (int i = 1; i <= max_game_entities; i++)
 	{
-		auto* base_entity = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(i));
+		auto* base_entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(i));
 
 		if (!base_entity || base_entity->IsDormant())
 			continue;

@@ -2,8 +2,6 @@
 // Created by tevin on 30/06/2026.
 //
 
-#include "../../thirdparty/libsigscan/libsigscan.h"
-
 #include "../logging/log.hpp"
 #include "../abstract/ihookmanager.hpp"
 

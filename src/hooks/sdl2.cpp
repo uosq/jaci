@@ -4,13 +4,10 @@
 
 #include <dlfcn.h>
 
-#include "../../thirdparty/d3d9/windows_base.h"
 #include "../../thirdparty/imgui/imgui_impl_sdl2.h"
 
 #include "../abstract/igui.hpp"
 #include "../abstract/ihookmanager.hpp"
-
-#include "../logging/log.hpp"
 
 SDL_Window* sdl_window = nullptr;
 
@@ -55,7 +52,7 @@ INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_Pol
 			const bool is_mouse_event = event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONDOWN
 						|| event->type == SDL_MOUSEBUTTONUP || event->type == SDL_MOUSEWHEEL;
 			
-			if ((is_key_event && io.WantCaptureKeyboard && event->type != SDL_KEYUP) || (is_mouse_event && io.WantCaptureMouse))
+			if ((is_key_event && io.WantCaptureKeyboard && event->type != SDL_KEYUP) || is_mouse_event)
 				event->type = 0;
 		}
 	}

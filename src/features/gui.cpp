@@ -10,7 +10,7 @@
 
 #include "../abstract/igui.hpp"
 
-#include "../interfaces/vgui_surface030.hpp"
+#include "../interfaces/interfaces.hpp"
 
 IGui* create_vulkan_renderer();
 IGui* create_opengl_renderer();
@@ -34,13 +34,13 @@ static void toggle_menu_visibility()
 	if (ImGui::IsKeyPressed(ImGuiKey_Insert, false) || ImGui::IsKeyPressed(ImGuiKey_F11, false))
 	{
 		is_open = !is_open;
-		v_surface()->SetCursorAlwaysVisible(is_open);
+		g_surface->SetCursorAlwaysVisible(is_open);
 	}
 
 	if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && is_open)
 	{
 		is_open = false;
-		v_surface()->SetCursorAlwaysVisible(is_open);
+		g_surface->SetCursorAlwaysVisible(is_open);
 	}
 }
 

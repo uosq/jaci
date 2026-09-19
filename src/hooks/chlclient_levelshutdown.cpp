@@ -15,10 +15,6 @@
                     00 00 00
 */
 
-#include "../../thirdparty/libsigscan/libsigscan.h"
-
-#include "../logging/log.hpp"
-
 #include "../abstract/ihookmanager.hpp"
 
 INIT_HOOK(LevelShutdown, void, (void* rdi), "client.so", "80 3D ? ? ? ? 00 75 ? C3")

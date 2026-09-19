@@ -1,12 +1,6 @@
-//
-// Created by tevin on 29/06/2026.
-//
+#pragma once
 
-#ifndef GUARACI_ISURFACE_HPP
-#define GUARACI_ISURFACE_HPP
-
-#include "../classes/iappsystem.hpp"
-
+#include "iappsystem.hpp"
 
 struct Color;
 class IImage;
@@ -323,7 +317,3 @@ public:
 	// !! Add your new stuff to the bottom of IMatSystemSurface instead.        !!
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 };
-
-ISurface* v_surface();
-
-#endif //GUARACI_ISURFACE_HPP

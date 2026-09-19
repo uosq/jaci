@@ -2,9 +2,9 @@
 
 #include <string>
 
+#include "../classes/vclient017.hpp"
 #include "../classes/datatable.hpp"
 #include "../classes/fnv.hpp"
-#include "../interfaces/vclient017.hpp"
 
 void CNetvars::dump(const char *baseClass, RecvTable *table, uint32_t offset)
 {

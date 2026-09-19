@@ -15,10 +15,8 @@
 #include "../classes/ctrace.hpp"
 #include "../classes/bspflags.hpp"
 
-#include "../interfaces/cglobalvars.hpp"
-#include "../interfaces/vcliententitylist003.hpp"
-#include "../interfaces/vengineclient014.hpp"
-#include "../interfaces/venginecvar004.hpp"
+#include "../interfaces/interfaces.hpp"
+
 #include "../utils/utils.hpp"
 #include "tracefilters.hpp"
 
@@ -28,9 +26,9 @@ constexpr int BONE_USED_BY_HITBOX = 0x100;
 
 static float get_interp()
 {
-	static ConVar* cl_interp = v_engine_cvar()->FindVar("cl_interp");
-	static ConVar* cl_updaterate = v_engine_cvar()->FindVar("cl_updaterate");
-	static ConVar* cl_interp_ratio = v_engine_cvar()->FindVar("cl_interp_ratio");
+	static ConVar* cl_interp = g_enginecvar->FindVar("cl_interp");
+	static ConVar* cl_updaterate = g_enginecvar->FindVar("cl_updaterate");
+	static ConVar* cl_interp_ratio = g_enginecvar->FindVar("cl_interp_ratio");
 
 	return std::max(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / cl_updaterate->GetFloat());
 }
@@ -42,7 +40,7 @@ bool backtrack::is_record_valid(const backtrack_record& record)
 
 	float correct = 0.0f;
 
-	if (const INetChannelInfo* netchan = v_engine_client()->GetNetChannelInfo(); netchan)
+	if (const INetChannelInfo* netchan = g_engineclient->GetNetChannelInfo(); netchan)
 	{
 		correct += netchan->GetLatency(FLOW_OUTGOING);
 		correct += netchan->GetLatency(FLOW_INCOMING);
@@ -50,12 +48,12 @@ bool backtrack::is_record_valid(const backtrack_record& record)
 
 	correct += get_interp();
 
-	static ConVar* sv_maxunlag = v_engine_cvar()->FindVar("sv_maxunlag");
+	static ConVar* sv_maxunlag = g_enginecvar->FindVar("sv_maxunlag");
 
 	if (sv_maxunlag)
 		correct = std::clamp(correct, 0.0f, sv_maxunlag->GetFloat());
 
-	const float delta = correct - (v_global_vars()->curtime - record.sim_time);
+	const float delta = correct - (g_globalvars->curtime - record.sim_time);
 
 	return std::fabs(delta) <= 0.2f;
 }
@@ -102,7 +100,7 @@ void backtrack::store()
 		if (!is_valid_player(player, local_team, local_index))
 			continue;
 
-		auto* entity = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(player.index));
+		auto* entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(player.index));
 		if (!entity) continue;
 
 		auto& records = player_records[player.index];
@@ -120,7 +118,7 @@ void backtrack::store()
 		records[0].mins = player.mins;
 		records[0].maxs = player.maxs;
 
-		entity->SetupBones(records[0].bones, 128, BONE_USED_BY_HITBOX, v_global_vars()->curtime);
+		entity->SetupBones(records[0].bones, 128, BONE_USED_BY_HITBOX, g_globalvars->curtime);
 	}
 }
 
@@ -179,7 +177,7 @@ void backtrack::reset()
 
 static bool is_backtrack_record_visible(const backtrack_record& record, const entity_s& target, const Vec3& eye_pos, CPlayer* local)
 {
-	CBaseEntity* target_ent = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(target.index));
+	CBaseEntity* target_ent = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
 
 	if (!target_ent)
 		return false;
@@ -228,7 +226,7 @@ static bool is_backtrack_record_visible(const backtrack_record& record, const en
 
 void backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 {
-	CPlayer* localplayer = reinterpret_cast<CPlayer*>(v_client_entity_list()->GetClientEntity(local.index));
+	CPlayer* localplayer = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
 	if (!localplayer) return;
 
 	CWeapon* weapon = localplayer->m_hActiveWeapon().Get();
@@ -251,7 +249,7 @@ void backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 		return;
 
 	const uint8_t local_team = local.team;
-	const Vec3 viewangles = v_engine_client()->GetViewAngles();
+	const Vec3 viewangles = g_engineclient->GetViewAngles();
 
 	// i don't like this
 	// is there a better way??

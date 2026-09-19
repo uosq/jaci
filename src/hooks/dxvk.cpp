@@ -4,9 +4,6 @@
 
 #include "../../thirdparty/d3d9/d3d9.h"
 #include "../../thirdparty/d3d9/windows_base.h"
-#include "../../thirdparty/libsigscan/libsigscan.h"
-
-#include "../logging/log.hpp"
 
 #include "../abstract/ihookmanager.hpp"
 #include "../abstract/igui.hpp"

@@ -5,21 +5,19 @@
 #include "../classes/cusercmd.hpp"
 #include "../classes/defs.hpp"
 
-#include "../interfaces/vcliententitylist003.hpp"
-#include "../interfaces/vengineclient014.hpp"
+#include "../interfaces/interfaces.hpp"
 
 #include "../classes/ctrace.hpp"
-#include "../interfaces/enginetraceclient003.hpp"
 #include "../classes/host.hpp"
 
 CPlayer* utils::get_localplayer()
 {
-	return reinterpret_cast<CPlayer*>(v_client_entity_list()->GetClientEntity(v_engine_client()->GetLocalPlayer()));
+	return reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(g_engineclient->GetLocalPlayer()));
 }
 
 bool utils::is_in_match()
 {
-	return v_engine_client()->IsConnected() && v_engine_client()->IsInGame();
+	return g_engineclient->IsConnected() && g_engineclient->IsInGame();
 }
 
 static bool is_shooting_hitscan(CWeapon* weapon, const CUserCmd* cmd)
@@ -234,14 +232,14 @@ void utils::trace_line(const Vec3& start, const Vec3& end, unsigned int mask, IT
 {
 	Ray_t ray;
 	ray.Init(start, end);
-	v_engine_trace()->TraceRay(ray, mask, filter, trace);
+	g_enginetrace->TraceRay(ray, mask, filter, trace);
 }
 
 void utils::trace_hull(const Vec3& start, const Vec3& end, const Vec3& mins, const Vec3& maxs, unsigned int mask, ITraceFilter* filter, CTrace* trace)
 {
 	Ray_t ray;
 	ray.Init(start, end, mins, maxs);
-	v_engine_trace()->TraceRay(ray, mask, filter, trace);
+	g_enginetrace->TraceRay(ray, mask, filter, trace);
 }
 
 float utils::attribute_hook_value(const float defaultValue, const char* attribName, CBaseEntity* entity)
@@ -270,14 +268,14 @@ float utils::remap_val(float flVal, float a, float b, float c, float d, bool do_
 
 bool utils::world_to_screen(const Vec3& pos, Vec3* screen_point)
 {
-	const VMatrix& vm = v_engine_client()->WorldToScreenMatrix();
+	const VMatrix& vm = g_engineclient->WorldToScreenMatrix();
 	const float w = vm[3][0] * pos.x + vm[3][1] * pos.y + vm[3][2] * pos.z + vm[3][3];
 
 	if (w < 0.001f)
 		return false;
 
 	int width, height;
-	v_engine_client()->GetScreenSize(width, height);
+	g_engineclient->GetScreenSize(width, height);
 
 	const float dbw = 1 / w;
 

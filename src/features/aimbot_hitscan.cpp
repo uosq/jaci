@@ -8,8 +8,7 @@
 #include "../classes/ctfplayer.hpp"
 #include "../classes/ctrace.hpp"
 
-#include "../interfaces/vcliententitylist003.hpp"
-#include "../interfaces/vengineclient014.hpp"
+#include "../interfaces/interfaces.hpp"
 
 #include "../utils/utils.hpp"
 
@@ -18,7 +17,6 @@
 #include "tracefilters.hpp"
 #include "../classes/bspflags.hpp"
 #include "../classes/cbaseanimating.hpp"
-#include "../interfaces/ivmodelclientinfo.hpp"
 
 static Vec3 INVALID_VEC3 {FLT_MAX, FLT_MAX, FLT_MAX};
 
@@ -59,11 +57,11 @@ static Vec3 get_weapon_default_hitpoint_position(const entity_s& target, const d
 	if (target.index == -1)
 		return INVALID_VEC3;
 
-	auto* entity = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(target.index));
+	auto* entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
 	if (!entity) return INVALID_VEC3;
 
 	auto* animating = reinterpret_cast<CBaseAnimating*>(entity);
-	auto model = v_model_info_client()->GetStudiomodel(entity->GetModel());
+	auto model = g_modelinfoclient->GetStudiomodel(entity->GetModel());
 
 	switch (hit_point)
 	{
@@ -98,7 +96,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	// janky ahh shit
 	Vec3 eye_pos;
 
-	if (CPlayer* player = reinterpret_cast<CPlayer*>(v_client_entity_list()->GetClientEntity(local.index)); player)
+	if (CPlayer* player = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index)); player)
 		eye_pos = player->get_eye_pos();
 	else
 		return;
@@ -113,7 +111,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 
 	double closest_fov = std::numeric_limits<double>::max();
 
-	const Vec3 viewangles = v_engine_client()->GetViewAngles();
+	const Vec3 viewangles = g_engineclient->GetViewAngles();
 
 	for (auto& player : players)
 	{
@@ -135,8 +133,8 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	if (target.index == -1)
 		return;
 
-	auto* lp = reinterpret_cast<CPlayer*>(v_client_entity_list()->GetClientEntity(local.index));
-	auto* tg = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(target.index));
+	auto* lp = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
+	auto* tg = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
 
 	if (utils::shoot(lp, tg, weapon, cmd))
 		cmd->viewangles = target_angle;

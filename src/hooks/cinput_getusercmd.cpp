@@ -1,6 +1,3 @@
-#include "../../thirdparty/libsigscan/libsigscan.h"
-
-#include "../logging/log.hpp"
 #include "../classes/cusercmd.hpp"
 #include "../abstract/ihookmanager.hpp"
 

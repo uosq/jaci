@@ -8,12 +8,6 @@
 #include "../classes/con_nprint.hpp"
 #include "../classes/cusercmd.hpp"
 
-#include "../interfaces/clientstate.hpp"
-#include "../interfaces/demo.hpp"
-#include "../interfaces/venginecvar004.hpp"
-#include "../interfaces/vclient017.hpp"
-#include "../interfaces/cinput.hpp"
-
 #include "../utils/mem.hpp"
 
 #include "../abstract/ihookmanager.hpp"
@@ -23,7 +17,7 @@
 #include "../features/misc.hpp"
 #include "../features/backtrack.hpp"
 
-#include "../interfaces/vengineclient014.hpp"
+#include "../interfaces/interfaces.hpp"
 
 #include "../logging/log.hpp"
 #include "../utils/utils.hpp"
@@ -33,7 +27,7 @@ bool sendpacket = true;
 
 static void CreateMove(const int sequence_number)
 {
-	CUserCmd* cmd = v_input()->GetUserCmd(sequence_number);
+	CUserCmd* cmd = g_input->GetUserCmd(sequence_number);
 	if (!cmd) return;
 
 	if (!utils::is_in_match())
@@ -95,7 +89,7 @@ static void CL_SendMove(const CClientState* cl)
 		const bool isnewcmd = to >= (nextcommandnr - moveMsg.m_nNewCommands + 1);
 
 		// first valid command number is 1
-		bOK = bOK && v_client()->WriteUsercmdDeltaToBuffer( &moveMsg.m_DataOut, from, to, isnewcmd );
+		bOK = bOK && g_client->WriteUsercmdDeltaToBuffer( &moveMsg.m_DataOut, from, to, isnewcmd );
 		from = to;
 	}
 
@@ -115,8 +109,8 @@ static bool Host_ShouldRun()
 {
 	static int current_tick = -1;
 	static int* host_tickcount = (int*)(RelToAbs((std::uintptr_t)sigscan_module("engine.so", "8B 15 ? ? ? ? 8B 49 58")));
-	static ConVar* singlestep = v_engine_cvar()->FindVar("singlestep");
-	static ConVar* cvarNext = v_engine_cvar()->FindVar("cvarNext");
+	static ConVar* singlestep = g_enginecvar->FindVar("singlestep");
+	static ConVar* cvarNext = g_enginecvar->FindVar("cvarNext");
 
 	// See if we are single stepping
 	if ( !singlestep->GetInt() )
@@ -162,10 +156,10 @@ INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "en
 
 	using shouldrun_fn = bool(*)();
 
-	static ConVar *host_limitlocal = v_engine_cvar()->FindVar("host_limitlocal");
-	static ConVar *cl_cmdrate = v_engine_cvar()->FindVar("cl_cmdrate");
+	static ConVar *host_limitlocal = g_enginecvar->FindVar("host_limitlocal");
+	static ConVar *cl_cmdrate = g_enginecvar->FindVar("cl_cmdrate");
 
-	auto* cl = v_clientstate();
+	auto* cl = g_clientstate;
 
 	if (cl->m_nSignonState < SIGNONSTATE_CONNECTED)
 		return;
@@ -175,7 +169,7 @@ INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "en
 
 	sendpacket = true;
 
-	if (v_demoplayer()->IsPlayingBack()) [[unlikely]]
+	if (g_demoplayer->IsPlayingBack()) [[unlikely]]
 	{
 		if (cl->isreplay || cl->ishltv) [[unlikely]]
 			sendpacket = false;
@@ -198,12 +192,12 @@ INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "en
 	{
 		const int next_command_number = cl->lastoutgoingcommand + cl->chokedcommands + 1;
 
-		v_client()->CreateMove(next_command_number, host_state->interval_per_tick - accumulated_extra_samples, !cl->m_bPaused);
+		g_client->CreateMove(next_command_number, host_state->interval_per_tick - accumulated_extra_samples, !cl->m_bPaused);
 
 		CreateMove(next_command_number);
 
-		if (v_demorecorder()->IsRecording())
-			v_demorecorder()->RecordUserInput(next_command_number);
+		if (g_demorecorder->IsRecording())
+			g_demorecorder->RecordUserInput(next_command_number);
 
 		if (sendpacket)
 			CL_SendMove(cl);
@@ -217,7 +211,7 @@ INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "en
 	if (!sendpacket)
 		return;
 
-	if (cl->m_NetChannel->IsTimingOut() && !v_demoplayer()->IsPlayingBack() && cl->m_nSignonState == SIGNONSTATE_FULL)
+	if (cl->m_NetChannel->IsTimingOut() && !g_demoplayer->IsPlayingBack() && cl->m_nSignonState == SIGNONSTATE_FULL)
 	{
 		using Con_NXPrintf_fn = void (*)(const con_nprint_t *, const char *fmt, ...);
 		static auto Con_NXPrintf = reinterpret_cast<Con_NXPrintf_fn>(sigscan_module("engine.so", "55 49 89 F2 48 89 E5 41 55 41 54 49 89 FC 48 81 EC D0 10 00 00"));

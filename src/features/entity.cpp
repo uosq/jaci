@@ -5,7 +5,7 @@
 #include "entity.hpp"
 
 #include "../classes/ctfplayer.hpp"
-#include "../interfaces/vcliententitylist003.hpp"
+#include "../interfaces/interfaces.hpp"
 
 Vec3 entity_s::get_center() const
 {
@@ -17,7 +17,7 @@ CWeapon* entity_s::get_weapon() const
 	if (index == -1)
 		return nullptr;
 
-	auto* entity = reinterpret_cast<CBaseEntity*>(v_client_entity_list()->GetClientEntity(index));
+	auto* entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(index));
 
 	if (!entity)
 		return nullptr;

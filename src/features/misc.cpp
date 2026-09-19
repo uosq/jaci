@@ -10,7 +10,7 @@
 #include "../classes/convar.hpp"
 #include "../classes/host.hpp"
 
-#include "../interfaces/venginecvar004.hpp"
+#include "../interfaces/interfaces.hpp"
 
 #include "../logging/log.hpp"
 
@@ -57,7 +57,7 @@ void misc::bhop(const entity_s& player, CUserCmd* cmd)
 
 void misc::antiafk(const entity_s &player, CUserCmd *cmd)
 {
-	static ConVar* mp_idlemaxtime = v_engine_cvar()->FindVar("mp_idlemaxtime");
+	static ConVar* mp_idlemaxtime = g_enginecvar->FindVar("mp_idlemaxtime");
 
 	if (!mp_idlemaxtime)
 	{

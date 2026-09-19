@@ -11,14 +11,11 @@
 #include "../classes/convar.hpp"
 
 #include "tracefilters.hpp"
-#include "../interfaces/cglobalvars.hpp"
 
-#include "../interfaces/venginecvar004.hpp"
+#include "../interfaces/interfaces.hpp"
 #include "../utils/utils.hpp"
 
 #include "../logging/log.hpp"
-
-#include "../interfaces/enginetraceclient003.hpp"
 
 #define COORD_INTEGER_BITS 14
 #define COORD_FRACTIONAL_BITS 5
@@ -92,10 +89,10 @@ static void begin_prediction(CPlayer *player, float seconds)
 		return;
 	}
 
-	static ConVar *sv_accelerate = v_engine_cvar()->FindVar("sv_accelerate");
-	static ConVar *sv_friction = v_engine_cvar()->FindVar("sv_friction");
-	static ConVar *sv_stopspeed = v_engine_cvar()->FindVar("sv_stopspeed");
-	static ConVar *sv_bounce = v_engine_cvar()->FindVar("sv_bounce");
+	static ConVar *sv_accelerate = g_enginecvar->FindVar("sv_accelerate");
+	static ConVar *sv_friction = g_enginecvar->FindVar("sv_friction");
+	static ConVar *sv_stopspeed = g_enginecvar->FindVar("sv_stopspeed");
+	static ConVar *sv_bounce = g_enginecvar->FindVar("sv_bounce");
 
 	m_filter.skip = m_pTarget = player;
 
@@ -118,7 +115,7 @@ static void begin_prediction(CPlayer *player, float seconds)
 	m_flMaxSpeed		   = player->m_flMaxspeed();
 	m_flTargetSeconds	   = seconds;
 	m_flAirSpeedCap		   = get_air_speed_cap();
-	m_flTickInterval	   = v_global_vars()->interval_per_tick;
+	m_flTickInterval	   = g_globalvars->interval_per_tick;
 
 	m_vecWishDir		   = m_vecVelocity;
 	m_vecWishDir.z		   = 0;
@@ -205,7 +202,7 @@ static float get_air_speed_cap()
 {
 	if (m_pTarget->in_cond(TF_COND_SHIELD_CHARGE))
 	{
-		static ConVar *tf_max_charge_speed = v_engine_cvar()->FindVar("tf_max_charge_speed");
+		static ConVar *tf_max_charge_speed = g_enginecvar->FindVar("tf_max_charge_speed");
 		return tf_max_charge_speed->GetFloat();
 	}
 
@@ -213,7 +210,7 @@ static float get_air_speed_cap()
 
 	if (m_pTarget->in_cond(TF_COND_PARACHUTE_DEPLOYED))
 	{
-		static ConVar *tf_parachute_aircontrol = v_engine_cvar()->FindVar("tf_parachute_aircontrol");
+		static ConVar *tf_parachute_aircontrol = g_enginecvar->FindVar("tf_parachute_aircontrol");
 		flCap *= tf_parachute_aircontrol->GetFloat();
 	}
 
@@ -735,7 +732,7 @@ static bool check_water()
 	level = WL_NotInWater;
 
 	// Grab point contents.
-	int cont = v_engine_trace()->GetPointContents(point);
+	int cont = g_enginetrace->GetPointContents(point);
 
 	// Are we under water? (not solid and not empty?)
 	if (cont & MASK_WATER)
@@ -745,7 +742,7 @@ static bool check_water()
 
 		// Now check a point that is at the player hull midpoint.
 		point.z = get_abs_origin().z + (vPlayerMins.z + vPlayerMaxs.z) * 0.5f;
-		cont	= v_engine_trace()->GetPointContents(point);
+		cont	= g_enginetrace->GetPointContents(point);
 		// If that point is also under water...
 		if (cont & MASK_WATER)
 		{
@@ -755,7 +752,7 @@ static bool check_water()
 			// Now check the eye position.  (view_ofs is relative
 			// to the origin)
 			point.z = get_abs_origin().z + m_pTarget->m_vecViewOffset().z;
-			cont	= v_engine_trace()->GetPointContents(point);
+			cont	= g_enginetrace->GetPointContents(point);
 			if (cont & MASK_WATER)
 				level = WL_Eyes; // In over our eyes
 		}

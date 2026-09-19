@@ -3,8 +3,7 @@
 #include "../utils/mem.hpp"
 #include "../utils/utils.hpp"
 
-#include "../interfaces/cglobalvars.hpp"
-#include "../interfaces/venginecvar004.hpp"
+#include "../interfaces/interfaces.hpp"
 
 #include "defs.hpp"
 #include "ctfplayer.hpp"
@@ -153,7 +152,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 	auto* pOwner = reinterpret_cast<CPlayer*>(pOwnerEntity);
 
 	const bool bDucking = pOwner->m_fFlags() & FL_DUCKING;
-	const float flGravity = v_engine_cvar()->FindVar("sv_gravity")->GetFloat() / 800;
+	const float flGravity = g_enginecvar->FindVar("sv_gravity")->GetFloat() / 800;
 
 	const int id = this->get_weapon_id();
 
@@ -267,7 +266,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 
 		case TF_WEAPON_FLAMETHROWER:
 		{
-			static ConVar *tf_flamethrower_size = v_engine_cvar()->FindVar("tf_flamethrower_size");
+			static ConVar *tf_flamethrower_size = g_enginecvar->FindVar("tf_flamethrower_size");
 			if (!tf_flamethrower_size)
 				return false;
 
@@ -303,7 +302,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 		case TF_WEAPON_BAT_WOOD:
 		case TF_WEAPON_BAT_GIFTWRAP:
 		{
-			static ConVar *tf_scout_stunball_base_speed = v_engine_cvar()->FindVar("tf_scout_stunball_base_speed");
+			static ConVar *tf_scout_stunball_base_speed = g_enginecvar->FindVar("tf_scout_stunball_base_speed");
 			info.speed				    = tf_scout_stunball_base_speed->GetFloat();
 			info.gravity				    = 1;
 			info.lifetime				    = flGravity;
@@ -355,7 +354,7 @@ bool CWeapon::is_melee()
 bool CDragonFury::has_full_charge()
 {
 	auto* owner = reinterpret_cast<CPlayer*>(m_hOwner().Get());
-	return owner ? (owner->m_flItemChargeMeter().at(LOADOUT_POSITION_PRIMARY) >= 100.0f) : false;
+	return owner ? (owner->m_flItemChargeMeter()[LOADOUT_POSITION_PRIMARY] >= 100.0f) : false;
 }
 
 bool CDragonFury::can_dragon_primary_attack()
@@ -371,7 +370,7 @@ bool CDragonFury::can_dragon_secondary_attack()
 	auto* owner = reinterpret_cast<CPlayer*>(m_hOwner().Get());
 	if (!owner) return false;
 
-	static ConVar* tf_flamethrower_burstammo = v_engine_cvar()->FindVar("tf_flamethrower_burstammo");
+	static ConVar* tf_flamethrower_burstammo = g_enginecvar->FindVar("tf_flamethrower_burstammo");
 
 	if (!tf_flamethrower_burstammo)
 	{
@@ -391,7 +390,7 @@ bool CRevolver::can_headshot()
 {
 	const int mode = static_cast<int>(utils::attribute_hook_value(0, "set_weapon_mode", this));
 	const bool is_ambassador = mode == 1;
-	return is_ambassador && (v_global_vars()->curtime - m_flLastFireTime()) > 1.0f;
+	return is_ambassador && (g_globalvars->curtime - m_flLastFireTime()) > 1.0f;
 }
 
 bool CWeapon::can_hit_teammates()
@@ -423,6 +422,6 @@ bool CWeapon::can_hit_teammates()
 			break;
 	}
 
-	static ConVar* mp_friendlyfire = v_engine_cvar()->FindVar("mp_friendlyfire");
+	static ConVar* mp_friendlyfire = g_enginecvar->FindVar("mp_friendlyfire");
 	return mp_friendlyfire ? mp_friendlyfire->GetBool() : false;
 }

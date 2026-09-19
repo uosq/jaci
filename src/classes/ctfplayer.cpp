@@ -1,6 +1,6 @@
 #include "ctfplayer.hpp"
 
-#include "../interfaces/vengineclient014.hpp"
+#include "../interfaces/interfaces.hpp"
 
 bool CPlayer::is_alive()
 {
@@ -11,7 +11,7 @@ std::string CPlayer::get_name() const
 {
 	player_info_t pi;
 
-	if (!v_engine_client()->GetPlayerInfo(entindex(), &pi))
+	if (!g_engineclient->GetPlayerInfo(entindex(), &pi))
 		return "";
 
 	return {pi.name};
@@ -21,7 +21,7 @@ bool CPlayer::is_tf_bot() const
 {
 	player_info_t pi;
 
-	if (!v_engine_client()->GetPlayerInfo(entindex(), &pi))
+	if (!g_engineclient->GetPlayerInfo(entindex(), &pi))
 		return false;
 
 	return pi.fakeplayer;

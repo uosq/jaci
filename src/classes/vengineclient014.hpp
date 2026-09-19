@@ -227,5 +227,3 @@ class IVEngineClient014
 	virtual void StopDemoRecording(void)							    = 0;
 	virtual void TakeScreenshot(const char *pszFilename, const char *pszFolder = NULL)	    = 0;
 };
-
-IVEngineClient014* v_engine_client();
