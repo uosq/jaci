@@ -64,8 +64,8 @@ static Vec3 get_weapon_default_hitpoint_position(const entity_s& target, const d
 
 	// not gonna store it as we can get it from m_CachedBoneData
 	// do we even need to setup bones? doesn't the game already have them setup at this point?? CHECKKK
-	if(!entity->SetupBones(NULL, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, g_globalvars->curtime))
-		return INVALID_VEC3;
+	//if(!entity->SetupBones(NULL, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, g_globalvars->curtime))
+		//return INVALID_VEC3;
 
 	auto* animating = reinterpret_cast<CBaseAnimating*>(entity);
 	auto* bone_cache = animating->m_CachedBoneData();
