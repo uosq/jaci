@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include "matrix3x4.hpp"
 
 constexpr double RADIANS_TO_DEGREES = (static_cast<float>(180.0f / M_PI));
 constexpr double DEGREES_TO_RADIANS = static_cast<double>(M_PI/180.0f);
@@ -278,6 +279,13 @@ struct Vec3
 	{
 		return x*x + y*y + z*z;
 	}
+
+	static void Transform(const Vec3& in, const matrix3x4& matrix, Vec3& out)
+	{
+		out.x = (in.x * matrix[0][0]) + (in.y * matrix[0][1]) + (in.z * matrix[0][2]) + (matrix[0][3]);
+    		out.y = (in.x * matrix[1][0]) + (in.y * matrix[1][1]) + (in.z * matrix[1][2]) + (matrix[1][3]);
+    		out.z = (in.x * matrix[2][0]) + (in.y * matrix[2][1]) + (in.z * matrix[2][2]) + (matrix[2][3]);
+	}
 };
 
 using QAngle = Vec3;
@@ -294,3 +302,6 @@ struct Vec3Aligned : public Vec3
 		return *this;
 	}
 };
+
+using Vector = Vec3;
+using RadianEuler = Vec3;

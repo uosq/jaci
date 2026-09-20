@@ -10,12 +10,15 @@
 #include "../../thirdparty/libsigscan/libsigscan.h"
 #include "../utils/mem.hpp"
 
-std::array<matrix3x4_t, 128>& CBaseAnimating::m_CachedBoneData()
+#include "../interfaces/interfaces.hpp"
+#include "studio.hpp"
+
+CUtlVector<matrix3x4>* CBaseAnimating::m_CachedBoneData()
 {
 	/*
 		xref: GetBoneCache
 
-		We want he 0x16f offset inside C_BaseAnimating::GetBoneCache
+		We want the 0x16f offset inside C_BaseAnimating::GetBoneCache
 
 			local_40 = self[0x16f];
 			local_38 = gpGlobals->curtime;
@@ -27,8 +30,10 @@ std::array<matrix3x4_t, 128>& CBaseAnimating::m_CachedBoneData()
 			return lVar2;
 			}
 	*/
-
-	return *reinterpret_cast<std::array<matrix3x4_t, 128>*>(reinterpret_cast<uintptr_t>(this) + (0x16f * sizeof(void*)));
+	
+	// 0x16f * 8 = 0xb78
+	// MOV RAX,qword ptr [R13 + 0xb78]
+	return reinterpret_cast<CUtlVector<matrix3x4>*>(reinterpret_cast<uintptr_t>(this) + 0xB78);
 }
 
 int* CBaseAnimating::m_iMostRecentModelBoneCounter()
@@ -74,4 +79,52 @@ void CBaseAnimating::invalidate_bone_cache()
 {
 	*m_iMostRecentModelBoneCounter() = get_global_model_bone_counter() - 1;
 	*m_flLastBoneSetupTime() = -FLT_MAX;
+}
+
+bool CBaseAnimating::get_hitbox_center(matrix3x4* bones, enum hitbox_enum hitbox, Vec3& out)
+{
+	const model_t* model = GetModel();
+
+	if (!model)
+		return false;
+
+	studiohdr_t* studiomodel = g_modelinfoclient->GetStudiomodel(model);
+
+	if (!studiomodel)
+		return false;
+
+	// i love implicitly casting shit
+	mstudiohitboxset_t* hitbox_set = studiomodel->pHitboxSet(m_nHitboxSet());
+
+	if (!hitbox_set || hitbox_set->numhitboxes <= hitbox)
+		return false;
+
+	mstudiobbox_t* box = hitbox_set->pHitbox(hitbox);
+
+	if (!box)
+		return false;
+
+	Vec3::Transform((box->bbmax + box->bbmin)*0.5f, bones[box->bone], out);
+	return true;
+}
+
+mstudiobbox_t* CBaseAnimating::get_hitbox(matrix3x4* bones, enum hitbox_enum hitbox)
+{
+	const model_t* model = GetModel();
+
+	if (!model)
+		return nullptr;
+
+	studiohdr_t* studiomodel = g_modelinfoclient->GetStudiomodel(model);
+
+	if (!studiomodel)
+		return nullptr;
+
+	// i love implicitly casting shit
+	mstudiohitboxset_t* hitbox_set = studiomodel->pHitboxSet(m_nHitboxSet());
+
+	if (!hitbox_set || hitbox_set->numhitboxes <= hitbox)
+		return nullptr;
+
+	return hitbox_set->pHitbox(hitbox);
 }

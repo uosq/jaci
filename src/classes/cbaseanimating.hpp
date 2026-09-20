@@ -8,6 +8,33 @@
 #include <cstdint>
 #include "cbaseentity.hpp"
 #include "../netvars/netvars.hpp"
+#include "cutlvector.hpp"
+#include "studio.hpp"
+
+// i would make it lower case
+// but im lazy as fuck so fuck this
+enum hitbox_enum
+{
+	HITBOX_HEAD,
+	HITBOX_PELVIS,
+	HITBOX_SPINE0,
+	HITBOX_SPINE1,
+	HITBOX_SPINE2,
+	HITBOX_SPINE3,
+	HITBOX_LEFT_UPPERARM,
+	HITBOX_LEFT_FOREARM,
+	HITBOX_LEFT_HAND,
+	HITBOX_RIGHT_UPPERARM,
+	HITBOX_RIGHT_FOREARM,
+	HITBOX_RIGHT_HAND,
+	HITBOX_LEFT_THIGH,
+	HITBOX_LEFT_CALF,
+	HITBOX_LEFT_FOOT,
+	HITBOX_RIGHT_THIGH,
+	HITBOX_RIGHT_CALF,
+	HITBOX_RIGHT_FOOT,
+	HITBOX_MAX
+};
 
 class CBaseAnimating : public CBaseEntity
 {
@@ -36,12 +63,15 @@ public:
 
 	NETVAR_ARRAY_LIMIT(m_flPoseParameter, "CBaseAnimating", "m_flPoseParameter", float, 24)
 
-	[[nodiscard]] std::array<matrix3x4, 128>& m_CachedBoneData();
+	[[nodiscard]] CUtlVector<matrix3x4>* m_CachedBoneData();
 
 	int* m_iMostRecentModelBoneCounter();
 	float* m_flLastBoneSetupTime();
 	static uint64_t get_global_model_bone_counter();
 	void invalidate_bone_cache();
+
+	bool get_hitbox_center(matrix3x4* bones, enum hitbox_enum hitbox, Vec3& out);
+	mstudiobbox_t* get_hitbox(matrix3x4* bones, enum hitbox_enum hitbox);
 };
 
 #endif //JACI_CBASEANIMATING_HPP

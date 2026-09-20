@@ -26,7 +26,6 @@ class IConVar;
 struct ButtonCode_t;
 class CViewSetup;
 struct qboolean;
-class Vector;
 class color32;
 class INetChannelInfo;
 class IAchievementMgr;
