@@ -4,29 +4,14 @@
 
 #include <vector>
 
-#include "../abstract/ihookmanager.hpp"
+#include "hookmanager.hpp"
+
 #include "../logging/log.hpp"
 
-class CHookManager final : public IHookManager
-{
-public:
-	explicit CHookManager();
-	void add_hook(HookFn fn) override;
-	void load_all_hooks() const override;
-	funchook* get_funchook() override;
+static constexpr size_t MAX_HOOKS = 512;
 
-private:
-	static constexpr std::size_t MAX_HOOKS = 512;
-
-	funchook* fh { nullptr };
-	std::vector<HookFn> hooks {};
-};
-
-IHookManager* f_hook_manager()
-{
-	static CHookManager manager {};
-	return &manager;
-}
+funchook* fh { nullptr };
+std::vector<CHookManager::HookFn> hooks {};
 
 CHookManager::CHookManager()
 {

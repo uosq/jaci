@@ -2,7 +2,7 @@
 #include <dlfcn.h>
 #include <chrono>
 
-#include "abstract/ihookmanager.hpp"
+#include "features/hookmanager.hpp"
 #include "features/bind_manager.hpp"
 #include "features/config.hpp"
 
@@ -31,12 +31,12 @@ __always_inline static void init()
 
 	bind_manager::add_bind(config.aimbot.key);
 
-	f_hook_manager()->load_all_hooks();
+	f_hook_manager.load_all_hooks();
 }
 
 extern "C" void __attribute__((visibility("default"))) Unload()
 {
-	funchook* fh = f_hook_manager()->get_funchook();
+	funchook* fh = f_hook_manager.get_funchook();
 	if (!fh) return;
 
 	funchook_uninstall(fh, 0);

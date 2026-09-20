@@ -2,6 +2,8 @@
 // Created by tevin on 29/06/2026.
 //
 
+// Only abstraction i won't mind as dxvk and opengl is fucking shit
+
 #ifndef GUARACI_IGUI_HPP
 #define GUARACI_IGUI_HPP
 

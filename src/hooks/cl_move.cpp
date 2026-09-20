@@ -10,7 +10,7 @@
 
 #include "../utils/mem.hpp"
 
-#include "../abstract/ihookmanager.hpp"
+#include "../features/hookmanager.hpp"
 #include "../features/aimbot.hpp"
 #include "../features/config.hpp"
 #include "../features/entitylist.hpp"

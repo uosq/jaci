@@ -123,7 +123,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 
 		target_angle = eye_pos.AngleTo(player.get_center());
 
-		if (const double fov = viewangles.GetFovTo(target_angle); static_cast<uint16_t>(fov) < config.aimbot.fov && fov < closest_fov)
+		if (const double fov = viewangles.GetFovTo(target_angle); static_cast<int>(fov) < config.aimbot.fov && fov < closest_fov)
 		{
 			target = player;
 			closest_fov = fov;

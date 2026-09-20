@@ -3,7 +3,7 @@
 //
 
 #include "../logging/log.hpp"
-#include "../abstract/ihookmanager.hpp"
+#include "../features/hookmanager.hpp"
 
 INIT_HOOK(Host_Shutdown, void, (), "engine.so", "80 3D ? ? ? ? 00 0F 85 ? ? ? ? 55 31 F6")
 {

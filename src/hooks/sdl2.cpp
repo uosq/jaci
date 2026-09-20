@@ -7,7 +7,7 @@
 #include "../../thirdparty/imgui/imgui_impl_sdl2.h"
 
 #include "../abstract/igui.hpp"
-#include "../abstract/ihookmanager.hpp"
+#include "../features/hookmanager.hpp"
 
 SDL_Window* sdl_window = nullptr;
 

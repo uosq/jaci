@@ -1,38 +1,39 @@
 //
-// Created by tevin on 28/06/2026.
+// Create by tevin on 19/09/2026
 //
 
-#ifndef GUARACI_IHOOKMANAGER_HPP
-#define GUARACI_IHOOKMANAGER_HPP
+#ifndef JACI_HOOKMANAGER_HPP
+#define JACI_HOOKMANAGER_HPP
+
 #include "../../thirdparty/funchook/funchook.h"
 #include "../../thirdparty/libsigscan/libsigscan.h"
 
 #include "../logging/log.hpp"
 
-class IHookManager
+class CHookManager
 {
 public:
 	using HookFn = void(*)();
 
-	virtual ~IHookManager() = default;
-	virtual void add_hook(HookFn fn) = 0;
-	virtual void load_all_hooks() const = 0;
-	virtual funchook* get_funchook() = 0;
+	explicit CHookManager();
+	void add_hook(HookFn fn);
+	void load_all_hooks() const;
+	funchook* get_funchook();
 };
 
-IHookManager* f_hook_manager();
+inline CHookManager f_hook_manager {};
 
 class HookRegister
 {
 public:
-	explicit HookRegister(const IHookManager::HookFn fn)
+	explicit HookRegister(const CHookManager::HookFn fn)
 	{
-		f_hook_manager()->add_hook(fn);
+		f_hook_manager.add_hook(fn);
 	}
 };
 
 #define REGISTER_HOOK(fn) HookRegister Hook_## fn {fn};
-#define PREPARE_HOOK(original_fn, hook_fn) funchook_prepare(f_hook_manager()->get_funchook(), reinterpret_cast<void**>(&(original_fn)), reinterpret_cast<void*>(hook_fn))
+#define PREPARE_HOOK(original_fn, hook_fn) funchook_prepare(f_hook_manager.get_funchook(), reinterpret_cast<void**>(&(original_fn)), reinterpret_cast<void*>(hook_fn))
 
 #define INIT_HOOK(name, ret, args, module, signature) \
 	using name## Fn = ret(*) args; \
@@ -82,4 +83,4 @@ REGISTER_HOOK(Init_## name) \
 \
 ret name args
 
-#endif //GUARACI_IHOOKMANAGER_HPP
+#endif // JACI_HOOKMANAGER_HPP
