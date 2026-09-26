@@ -33,24 +33,24 @@ static void CreateMove(const int sequence_number)
 	if (!utils::is_in_match())
 		return;
 
-	if (const entity_s localplayer = entitylist::get_local(); localplayer.index != -1)
+	if (const entity_s localplayer = f_entitylist::get_local(); localplayer.index != -1)
 	{
 		const CUserCmd copy = *cmd;
 
-		if (config.misc.bhop)
-			misc::bhop(localplayer, cmd);
+		if (f_config.misc.bhop)
+			f_misc::bhop(localplayer, cmd);
 
-		if (config.misc.antiafk)
-			misc::antiafk(localplayer, cmd);
+		if (f_config.misc.antiafk)
+			f_misc::antiafk(localplayer, cmd);
 
 		if (CWeapon* weapon = localplayer.get_weapon(); weapon)
 		{
-			aimbot::run(localplayer, weapon, cmd);
+			f_aimbot::run(localplayer, weapon, cmd);
 		}
 
-		backtrack::manual_aiming(cmd, localplayer);
+		f_backtrack::manual_aiming(cmd, localplayer);
 
-		if (config.fix_movement)
+		if (f_config.fix_movement)
 			utils::fix_movement(cmd, cmd->viewangles, copy.viewangles);
 	}
 }

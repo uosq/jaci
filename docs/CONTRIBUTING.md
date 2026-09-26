@@ -1,13 +1,13 @@
 # Issues
 
-Describe clearly what is the issue. If you have a question, ask it in the discord server.
+Describe clearly what is the issue. If you have a question, make a Issue
 
 ### Bugs
 
-Provide steps to reproduce the bug and a screenshot/video if possible.
+Provide steps to reproduce the bug and a screenshot/video if possible
 
 **Try to share as much info as possible**: situations that it can happen, debug logs (check the terminal), crash dumps,
-etc. The sky is the limit, GDB is your friend.
+etc. The sky is the limit, GDB is your friend
 
 # Pull Requests
 

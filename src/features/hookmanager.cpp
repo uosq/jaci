@@ -11,9 +11,9 @@
 static constexpr size_t MAX_HOOKS = 512;
 
 funchook* fh { nullptr };
-std::vector<CHookManager::HookFn> hooks {};
+std::vector<hook_manager::HookFn> hooks {};
 
-CHookManager::CHookManager()
+hook_manager::hook_manager()
 {
 	fh = funchook_create();
 
@@ -24,7 +24,7 @@ CHookManager::CHookManager()
 	}
 }
 
-void CHookManager::add_hook(const HookFn fn)
+void hook_manager::add_hook(const HookFn fn)
 {
 	if (hooks.size() >= MAX_HOOKS)
 	{
@@ -35,7 +35,7 @@ void CHookManager::add_hook(const HookFn fn)
 	hooks.emplace_back(fn);
 }
 
-void CHookManager::load_all_hooks() const
+void hook_manager::load_all_hooks() const
 {
 	if (fh == nullptr)
 	{
@@ -56,7 +56,7 @@ void CHookManager::load_all_hooks() const
 		LOG("couldn't install hooks! Error: {}", funchook_error_message(fh));
 }
 
-funchook* CHookManager::get_funchook()
+funchook* hook_manager::get_funchook()
 {
 	return fh;
 }

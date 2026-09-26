@@ -15,9 +15,9 @@ INIT_HOOK(SetSignonState, void, (void* self, int state, int count), "engine.so",
 
 	if (state == SIGNONSTATE_FULL)
 	{
-		entitylist::reset();
-		misc::reset();
-		backtrack::reset();
+		f_entitylist::reset();
+		f_misc::reset();
+		f_backtrack::reset();
 
 		if (utils::is_in_match())
 			LOG("Joined a match");

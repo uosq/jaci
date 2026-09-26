@@ -8,8 +8,8 @@ INIT_HOOK(FrameStageNotify, void, (void* chlclient, int stage), "client.so", "83
 {
 	if (stage == FRAME_NET_UPDATE_END)
 	{
-		entitylist::update();
-		backtrack::store();
+		f_entitylist::update();
+		f_backtrack::store();
 	}
 
 	original_FrameStageNotify(chlclient, stage);

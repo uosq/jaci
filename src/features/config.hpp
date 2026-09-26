@@ -4,8 +4,6 @@
 
 #ifndef JACI_CONFIG_HPP
 #define JACI_CONFIG_HPP
-#include <cstdint>
-
 #include "bind_s.hpp"
 
 struct config_s
@@ -31,6 +29,6 @@ struct config_s
 	bool fix_movement = false;
 };
 
-inline config_s config;
+inline struct config_s f_config {};
 
 #endif //JACI_CONFIG_HPP

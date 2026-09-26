@@ -7,9 +7,9 @@
 
 void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd);
 
-void aimbot::run(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+void f_aimbot::run(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (!config.aimbot.key.active)
+	if (!f_config.aimbot.key.active)
 		return;
 
 	switch (weapon->get_weapon_type())

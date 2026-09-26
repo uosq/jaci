@@ -68,14 +68,14 @@ static void draw_main_window()
 	if (ImGui::Begin("Test Window"))
 	{
 		ImGui::SeparatorText("Aimbot");
-		config.aimbot.key.draw("Key");
-		ImGui::SliderInt("Fov", &config.aimbot.fov, 0, 180);
+		f_config.aimbot.key.draw("Key");
+		ImGui::SliderInt("Fov", &f_config.aimbot.fov, 0, 180);
 
-		ImGui::Checkbox("Bunny Hop", &config.misc.bhop);
-		ImGui::Checkbox("Fix Movement", &config.fix_movement);
+		ImGui::Checkbox("Bunny Hop", &f_config.misc.bhop);
+		ImGui::Checkbox("Fix Movement", &f_config.fix_movement);
 
-		ImGui::Checkbox("Backtrack", &config.backtrack.enabled);
-		ImGui::SliderInt("Max Ticks", &config.backtrack.max_ticks, 0, 14);
+		ImGui::Checkbox("Backtrack", &f_config.backtrack.enabled);
+		ImGui::SliderInt("Max Ticks", &f_config.backtrack.max_ticks, 0, 14);
 	}
 	ImGui::End();
 }

@@ -14,9 +14,9 @@ INIT_HOOK(Disconnect, void, (void* self, const char* reason, bool show_main_menu
 {
 	original_Disconnect(self, reason, show_main_menu);
 
-	misc::reset();
-	entitylist::reset();
-	//backtrack::reset();
+	f_misc::reset();
+	f_entitylist::reset();
+	//f_backtrack::reset();
 
 	LOG("Disconnected from match. Reason: {}", reason);
 }

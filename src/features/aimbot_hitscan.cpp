@@ -2,7 +2,6 @@
 // Created by tevin on 07/09/2026.
 //
 
-#include <cstddef>
 #include "config.hpp"
 
 #include "../classes/cusercmd.hpp"
@@ -10,7 +9,6 @@
 #include "../classes/ctrace.hpp"
 #include "../classes/bspflags.hpp"
 #include "../classes/cbaseanimating.hpp"
-#include "../classes/studio.hpp"
 
 #include "../interfaces/interfaces.hpp"
 
@@ -20,7 +18,7 @@
 #include "entity.hpp"
 #include "tracefilters.hpp"
 
-static const Vec3 INVALID_VEC3 {FLT_MAX, FLT_MAX, FLT_MAX};
+constexpr Vec3 INVALID_VEC3 {FLT_MAX, FLT_MAX, FLT_MAX};
 
 enum class default_hit_point
 {
@@ -140,7 +138,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	if (!localplayer) return;
 
 	Vec3 eye_pos = localplayer->get_eye_pos();
-	const auto players = entitylist::get_players();
+	const auto players = f_entitylist::get_players();
 	if (players.empty()) return;
 
 	auto default_hit_point = get_weapon_default_hit_point(weapon);
@@ -173,7 +171,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 			target_angle = eye_pos.AngleTo(fallback_point);
 		}
 
-		if (const double fov = viewangles.GetFovTo(target_angle); fov < config.aimbot.fov && fov < closest_fov)
+		if (const double fov = viewangles.GetFovTo(target_angle); fov < f_config.aimbot.fov && fov < closest_fov)
 		{
 			target = player;
 			best_target_angle = target_angle;

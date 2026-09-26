@@ -88,7 +88,7 @@ static void find_localplayer_entity()
 	}
 }
 
-void entitylist::update()
+void f_entitylist::update()
 {
 	reset();
 
@@ -120,17 +120,17 @@ void entitylist::update()
 	find_localplayer_entity();
 }
 
-std::span<const entity_s> entitylist::get_players()
+std::span<const entity_s> f_entitylist::get_players()
 {
 	return {players.data(), player_count};
 }
 
-const entity_s& entitylist::get_local()
+const entity_s& f_entitylist::get_local()
 {
 	return localplayer_entity;
 }
 
-void entitylist::reset()
+void f_entitylist::reset()
 {
 	player_resource = nullptr;
 

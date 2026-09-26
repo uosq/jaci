@@ -9,7 +9,7 @@
 #include "../classes/cusercmd.hpp"
 #include "../classes/cweapon.hpp"
 
-namespace aimbot
+namespace f_aimbot
 {
 	inline int target_index = -1;
 

@@ -8,7 +8,7 @@
 #include "entity.hpp"
 #include <span>
 
-namespace entitylist
+namespace f_entitylist
 {
 	void update();
 

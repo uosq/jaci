@@ -8,7 +8,7 @@
 
 namespace bind_manager
 {
-	void add_bind(bind_s& bind);
+	void add_bind(struct bind_s& bind);
 	void update_binds();
 }
 

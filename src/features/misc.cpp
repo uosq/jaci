@@ -18,7 +18,7 @@ static bool used_air_jump = false;
 static bool jump_released = false;
 static int afk_ticks = 0;
 
-void misc::bhop(const entity_s& player, CUserCmd* cmd)
+void f_misc::bhop(const entity_s& player, CUserCmd* cmd)
 {
 	const bool wants_jump = (cmd->buttons & IN_JUMP) != 0;
 	const bool is_on_ground = player.player_flags.on_ground;
@@ -55,7 +55,7 @@ void misc::bhop(const entity_s& player, CUserCmd* cmd)
 	}
 }
 
-void misc::antiafk(const entity_s &player, CUserCmd *cmd)
+void f_misc::antiafk(const entity_s &player, CUserCmd *cmd)
 {
 	static ConVar* mp_idlemaxtime = g_enginecvar->FindVar("mp_idlemaxtime");
 
@@ -82,7 +82,7 @@ void misc::antiafk(const entity_s &player, CUserCmd *cmd)
 	}
 }
 
-void misc::reset()
+void f_misc::reset()
 {
 	jump_released = false;
 	used_air_jump = false;

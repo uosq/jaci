@@ -22,7 +22,7 @@ struct backtrack_record
 	backtrack_record() : bones{} {}
 };
 
-namespace backtrack
+namespace f_backtrack
 {
 	void store();
 

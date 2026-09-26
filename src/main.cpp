@@ -29,7 +29,7 @@ __always_inline static void init()
 		return;
 	}
 
-	bind_manager::add_bind(config.aimbot.key);
+	bind_manager::add_bind(f_config.aimbot.key);
 
 	f_hook_manager.load_all_hooks();
 }

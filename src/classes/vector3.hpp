@@ -15,7 +15,7 @@ struct Vec3
 {
 	float x, y, z;
 
-	explicit Vec3(const float x = 0.0f, const float y = 0.0f, const float z = 0.0f) : x(x), y(y), z(z) {}
+	constexpr explicit Vec3(const float x = 0.0f, const float y = 0.0f, const float z = 0.0f) : x(x), y(y), z(z) {}
 
 	float& operator[](const int index)
 	{

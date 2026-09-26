@@ -5,11 +5,11 @@
 #ifndef JACI_MISC_HPP
 #define JACI_MISC_HPP
 
-class CUserCmd;
-
 #include "entity.hpp"
 
-namespace misc
+class CUserCmd;
+
+namespace f_misc
 {
 	void bhop(const entity_s& player, CUserCmd* cmd);
 	void antiafk(const entity_s& player, CUserCmd* cmd);
