@@ -20,6 +20,9 @@ public:
 #define REGISTER_FEATURE(type) \
 	static f_feature_register<type> g_register_##type;
 
+// made some macros
+// because VSCode is stupid and dumb and bad
+
 #define F_CREATEMOVE() \
 	void on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd) override;
 
