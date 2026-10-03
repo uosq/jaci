@@ -13,7 +13,7 @@
 #include "../interfaces/interfaces.hpp"
 #include "studio.hpp"
 
-CUtlVector<matrix3x4>* CBaseAnimating::m_CachedBoneData()
+CUtlVector<matrix3x4>& CBaseAnimating::m_CachedBoneData()
 {
 	/*
 		xref: GetBoneCache
@@ -33,7 +33,7 @@ CUtlVector<matrix3x4>* CBaseAnimating::m_CachedBoneData()
 	
 	// 0x16f * 8 = 0xb78
 	// MOV RAX,qword ptr [R13 + 0xb78]
-	return reinterpret_cast<CUtlVector<matrix3x4>*>(reinterpret_cast<uintptr_t>(this) + 0xB78);
+	return *reinterpret_cast<CUtlVector<matrix3x4>*>(reinterpret_cast<uintptr_t>(this) + 0xB78);
 }
 
 int* CBaseAnimating::m_iMostRecentModelBoneCounter()

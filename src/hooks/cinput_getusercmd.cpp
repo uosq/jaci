@@ -1,5 +1,5 @@
+#include "../features/hook_manager/hookmanager.hpp"
 #include "../classes/cusercmd.hpp"
-#include "../features/hookmanager.hpp"
 
 INIT_HOOK(CInput_GetUserCmd, CUserCmd*, (void* input, int sequence_number), "client.so", "55 48 89 E5 41 56 41 89 D6 41 55 49 89 FD 41 54 4C 8D 65 DC")
 {

@@ -5,7 +5,7 @@
 #include "../../thirdparty/d3d9/d3d9.h"
 #include "../../thirdparty/d3d9/windows_base.h"
 
-#include "../features/hookmanager.hpp"
+#include "../features/hook_manager/hookmanager.hpp"
 #include "../abstract/igui.hpp"
 
 LPDIRECT3DDEVICE9 d3d_device = nullptr;

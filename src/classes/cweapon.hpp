@@ -108,3 +108,18 @@ class CRevolver : public CWeapon
 public:
 	bool can_headshot();
 };
+
+enum MinigunState_t
+{
+	AC_STATE_IDLE = 0,
+	AC_STATE_STARTFIRING,
+	AC_STATE_FIRING,
+	AC_STATE_SPINNING,
+	AC_STATE_DRYFIRE
+};
+
+class CMinigun : public CWeapon
+{
+public:
+	NETVAR(m_iWeaponState, "CTFMinigun", "m_iWeaponState", int)
+};

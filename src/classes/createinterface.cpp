@@ -38,19 +38,19 @@ bool GetCreateInterface(CreateInterfaceFn& out, const char *module_name)
 {
 	std::string name = FindLoadedModule(std::string("/") + module_name);
 
-	LOG("Found module at '{}'\n", name.c_str());
+	make_log(std::format("Found module '{}'", name));
 
 	void* lib = dlopen(name.c_str(), RTLD_NOLOAD | RTLD_NOW);
 	if (lib == nullptr)
 	{
-		LOG("Shared object '{}' is nullptr!\n", module_name);
+		make_log(std::format("Shared '{}' object is nullptr!", module_name));
 		return false;
 	}
 
 	void* interface_name_ptr = dlsym(lib, "CreateInterface");
 	if (interface_name_ptr == nullptr)
 	{
-		LOG("Couldn't get CreateInterface of shared object '{}'\n", module_name);
+		make_log(std::format("Couldn't get CreateInterface of shared '{}' object", module_name));
 		return false;
 	}
 	

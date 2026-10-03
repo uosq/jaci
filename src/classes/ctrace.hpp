@@ -80,7 +80,7 @@ public:
 class CTrace : public CBaseTrace
 {
 public:
-	[[nodiscard]] bool DidHit() const;
+	bool DidHit() const;
 
 	float fractionleftsolid{};
 	csurface_t surface{};

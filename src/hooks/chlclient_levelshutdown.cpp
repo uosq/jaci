@@ -15,7 +15,7 @@
                     00 00 00
 */
 
-#include "../features/hookmanager.hpp"
+#include "../features/hook_manager/hookmanager.hpp"
 
 INIT_HOOK(LevelShutdown, void, (void* rdi), "client.so", "80 3D ? ? ? ? 00 75 ? C3")
 {

@@ -374,7 +374,7 @@ bool CDragonFury::can_dragon_secondary_attack()
 
 	if (!tf_flamethrower_burstammo)
 	{
-		LOG("tf_flamethrower_burstammo is null!");
+		make_log("tf_flamethrower_burstammo is null!");
 		return false;
 	}
 

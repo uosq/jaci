@@ -10,12 +10,9 @@
 
 #include "../utils/mem.hpp"
 
-#include "../features/hookmanager.hpp"
-#include "../features/aimbot.hpp"
-#include "../features/config.hpp"
-#include "../features/entitylist.hpp"
-#include "../features/misc.hpp"
-#include "../features/backtrack.hpp"
+#include "../features/entitylist/entitylist.hpp"
+#include "../features/hook_manager/hookmanager.hpp"
+#include "../features/feature_manager.hpp"
 
 #include "../interfaces/interfaces.hpp"
 
@@ -35,23 +32,9 @@ static void CreateMove(const int sequence_number)
 
 	if (const entity_s localplayer = f_entitylist::get_local(); localplayer.index != -1)
 	{
-		const CUserCmd copy = *cmd;
+		CWeapon* weapon = localplayer.get_weapon();
 
-		if (f_config.misc.bhop)
-			f_misc::bhop(localplayer, cmd);
-
-		if (f_config.misc.antiafk)
-			f_misc::antiafk(localplayer, cmd);
-
-		if (CWeapon* weapon = localplayer.get_weapon(); weapon)
-		{
-			f_aimbot::run(localplayer, weapon, cmd);
-		}
-
-		f_backtrack::manual_aiming(cmd, localplayer);
-
-		if (f_config.fix_movement)
-			utils::fix_movement(cmd, cmd->viewangles, copy.viewangles);
+		f_feature_manager::get().dispatch_create_move(localplayer, weapon, cmd);
 	}
 }
 
@@ -149,7 +132,7 @@ INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "en
 
 	if (host_shouldrun_ptr == nullptr) [[unlikely]]
 	{
-		LOG("Host_ShouldRun is null");
+		make_log("Host_ShouldRun is null");
 		original_CL_Move(accumulated_extra_samples, bFinalTick);
 		return;
 	}

@@ -16,7 +16,7 @@ static void initialize_globalvars()
 	g_globalvars = *reinterpret_cast<CGlobalVars**>(resolved);
 
 	if (!g_globalvars)
-		LOG("g_globalvars is null");
+		make_log("g_globalvars is null");
 }
 
 static void initialize_input()
@@ -30,7 +30,7 @@ static void initialize_input()
 	g_input = *reinterpret_cast<CInput**>(resolved);
 
 	if (!g_input)
-		LOG("g_input is null");
+		make_log("g_input is null");
 }
 
 static void initialize_clientstate()
@@ -44,7 +44,7 @@ static void initialize_clientstate()
 	g_clientstate = reinterpret_cast<CClientState*>(resolved_addr);
 
 	if (!g_clientstate)
-		LOG("g_clientstate is null");
+		make_log("g_clientstate is null");
 }
 
 static void initialize_demo()
@@ -55,7 +55,7 @@ static void initialize_demo()
 	const auto CEngineClient_vfunction125 = reinterpret_cast<uintptr_t>(sigscan_module("engine.so", "55 48 89 E5 53 48 83 EC 08 48 8D 1D ? ? ? ? 48 8B 3B 48 8B 07 FF 50 20 84 C0 74 ? 48 8B 3B 48 8B 07"));
 	if (!CEngineClient_vfunction125)
 	{
-		LOG("CEngineClient_vfunction125's signature broke!");
+		make_log("CEngineClient_vfunction125's signature broke!");
 		return;
 	}
 
@@ -63,10 +63,10 @@ static void initialize_demo()
 	g_demoplayer = *reinterpret_cast<IDemoPlayer**>(rel_to_abs(CEngineClient_vfunction125 + 0x26));
 
 	if (!g_demoplayer)
-		LOG("g_demoplayer is null");
+		make_log("g_demoplayer is null");
 
 	if (!g_demorecorder)
-		LOG("g_demorecorder is null");
+		make_log("g_demorecorder is null");
 }
 
 static void initialize_enginetrace()
@@ -77,7 +77,7 @@ static void initialize_enginetrace()
 	g_enginetrace = GetInterface<IEngineTrace>("engine.so", "EngineTraceClient003");
 
 	if (!g_enginetrace)
-		LOG("g_enginetrace is null");
+		make_log("g_enginetrace is null");
 }
 
 static void initialize_modelinfoclient()
@@ -88,7 +88,7 @@ static void initialize_modelinfoclient()
 	g_modelinfoclient = GetInterface<IVModelInfoClient>("engine.so", "VModelInfoClient006");
 
 	if (!g_modelinfoclient)
-		LOG("g_modelinfoclient is null");
+		make_log("g_modelinfoclient is null");
 }
 
 static void initialize_client()
@@ -99,7 +99,7 @@ static void initialize_client()
 	g_client = GetInterface<CHLClient>("client.so", "VClient017");
 
 	if (!g_client)
-		LOG("g_client is null");
+		make_log("g_client is null");
 }
 
 static void initialize_cliententitylist()
@@ -110,7 +110,7 @@ static void initialize_cliententitylist()
 	g_cliententitylist = GetInterface<IClientEntityList>("client.so", "VClientEntityList003");
 
 	if (!g_cliententitylist)
-		LOG("g_cliententitylist is null");
+		make_log("g_cliententitylist is null");
 }
 
 static void initialize_engineclient()
@@ -121,7 +121,7 @@ static void initialize_engineclient()
 	g_engineclient = GetInterface<IVEngineClient014>("engine.so", "VEngineClient014");
 
 	if (!g_engineclient)
-		LOG("g_engineclient is null");
+		make_log("g_engineclient is null");
 }
 
 static void initialize_enginecvar()
@@ -132,7 +132,7 @@ static void initialize_enginecvar()
 	g_enginecvar = GetInterface<ICvar>("libvstdlib.so", "VEngineCvar004");
 
 	if (!g_enginecvar)
-		LOG("g_enginecvar is null");
+		make_log("g_enginecvar is null");
 }
 
 static void initialize_surface()
@@ -143,7 +143,7 @@ static void initialize_surface()
 	g_surface = GetInterface<ISurface>("vguimatsurface.so", "VGUI_Surface030");
 
 	if (!g_surface)
-		LOG("g_surface is null");
+		make_log("g_surface is null");
 }
 
 bool initialize_interfaces()

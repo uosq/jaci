@@ -1,28 +1,27 @@
-#pragma once
+#ifndef JACI_LOG_HPP
+#define JACI_LOG_HPP
 
-#define FMT_HEADER_ONLY
-#include <fmt/format.h>
-#include <iostream>
-#include <string_view>
-#include <source_location>
+#include <chrono>
+#include <vector>
 
 //#define LOG(fmt, ...) std::fprintf(stderr, "'%s' at line '%i' " fmt "\n", __extension__ __PRETTY_FUNCTION__, __builtin_LINE(), ## __VA_ARGS__)
 
-struct log_location {
-	std::string_view fmt;
-	std::source_location loc;
+struct log_info
+{
+	log_info(const std::string& text);
 
-	template <typename T>
-	requires std::convertible_to<T, std::string_view>
-	log_location(const T& f, const std::source_location l = std::source_location::current()) : fmt(f), loc(l) {}
+	uint32_t id;
+	std::string message;
+	std::chrono::system_clock::time_point time;
+
+	std::string get_formatted_timestamp() const;
+	std::string get_formatted_text() const;
+	const std::string& get_text() const;
 };
 
-template<typename... Args>
-void LOG(const log_location target, Args&&... args)
-{
-	const std::string message = fmt::vformat(target.fmt, fmt::make_format_args(args...));
+void make_log(const std::string& text);
+const std::vector<log_info>& get_logs();
+void export_logs();
+void clear_logs();
 
-	std::cout << "[" << target.loc.function_name() << "]: "
-		  << target.loc.line() << ": "
-		  << message << std::endl;
-}
+#endif

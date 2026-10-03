@@ -2,12 +2,13 @@
 #include <dlfcn.h>
 #include <chrono>
 
-#include "features/hookmanager.hpp"
-#include "features/bind_manager.hpp"
-#include "features/config.hpp"
+#include "features/feature_manager.hpp"
+#include "features/hook_manager/hookmanager.hpp"
+#include "features/binds/bind_manager.hpp"
+#include "features/config/config.hpp"
 
-#include "logging/log.hpp"
 #include "netvars/netvars.hpp"
+#include "logging/log.hpp"
 
 #include "interfaces/interfaces.hpp"
 
@@ -25,22 +26,14 @@ __always_inline static void init()
 	// wtf??
 	if (!netvars.init(g_client))
 	{
-		LOG("netvars->init failed! m_netvar_map is empty! WTF");
+		make_log("m_netvar_map is empty! WTF");
 		return;
 	}
 
 	bind_manager::add_bind(f_config.aimbot.key);
+	f_feature_manager::get().dispatch_initialize();
 
 	f_hook_manager.load_all_hooks();
-}
-
-extern "C" void __attribute__((visibility("default"))) Unload()
-{
-	funchook* fh = f_hook_manager.get_funchook();
-	if (!fh) return;
-
-	funchook_uninstall(fh, 0);
-	funchook_destroy(fh);
 }
 
 extern "C" void __attribute__((visibility("default"))) InitLoucura()

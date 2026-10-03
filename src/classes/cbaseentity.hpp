@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cbasehandle.hpp"
+#include "defs.hpp"
+#include "eclassid.hpp"
 #include "icliententity.hpp"
 
 #include "../netvars/netvars.hpp"
@@ -34,6 +36,20 @@ public:
 	__always_inline bool is_tf_robot()
 	{
 		return GetClassID() == ETFClassID::CTFRobotDestruction_Robot;
+	}
+
+	__always_inline bool is_a_building()
+	{
+		switch(GetClassID())
+		{
+			case ETFClassID::CObjectSentrygun:
+			case ETFClassID::CObjectDispenser:
+			case ETFClassID::CObjectTeleporter:
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 	void calc_abs_velocity();

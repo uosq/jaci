@@ -42,7 +42,6 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 			return false;
 		}
 
-#if 0		// TODO: add wait for charge
 		// max ammo
 		// dump this shit before we die
 		if (clip1 >= 3)
@@ -50,7 +49,6 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 			cmd->buttons &= ~IN_ATTACK;
 			return true;
 		}
-#endif
 
 		cmd->buttons &= ~IN_ATTACK;
 		return true;
@@ -60,11 +58,20 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 	{
 		case WeaponType::HITSCAN:
 		{
-			if (is_shooting_hitscan(weapon, cmd))
-				return true;
-
 			switch (weapon->get_weapon_id())
 			{
+				case TF_WEAPON_MINIGUN:
+				{
+					CMinigun* minigun = reinterpret_cast<CMinigun*>(weapon);
+					
+					cmd->buttons |= IN_ATTACK;
+
+					const int& weapon_state = minigun->m_iWeaponState();
+					bool can_fire = weapon_state == AC_STATE_FIRING || weapon_state == AC_STATE_SPINNING;
+
+					return can_fire ? is_shooting_hitscan(weapon, cmd) : false;
+				}
+
 				case TF_WEAPON_SNIPERRIFLE:
 				case TF_WEAPON_SNIPERRIFLE_DECAP: // bazaar's bargain
 				{

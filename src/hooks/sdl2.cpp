@@ -7,7 +7,7 @@
 #include "../../thirdparty/imgui/imgui_impl_sdl2.h"
 
 #include "../abstract/igui.hpp"
-#include "../features/hookmanager.hpp"
+#include "../features/hook_manager/hookmanager.hpp"
 
 SDL_Window* sdl_window = nullptr;
 
@@ -36,7 +36,8 @@ INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_Pol
 
 		if (windowID != 0)
 		{
-			if (SDL_Window* activeWindow = SDL_GetWindowFromID(windowID)) sdl_window = activeWindow;
+			if (SDL_Window* activeWindow = SDL_GetWindowFromID(windowID))
+				sdl_window = activeWindow;
 		}
 	}
 
@@ -52,7 +53,7 @@ INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_Pol
 			const bool is_mouse_event = event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONDOWN
 						|| event->type == SDL_MOUSEBUTTONUP || event->type == SDL_MOUSEWHEEL;
 			
-			if ((is_key_event && io.WantCaptureKeyboard && event->type != SDL_KEYUP) || is_mouse_event)
+			if ((is_key_event && (io.WantCaptureKeyboard || event->key.keysym.scancode == SDL_SCANCODE_ESCAPE)) || is_mouse_event)
 				event->type = 0;
 		}
 	}

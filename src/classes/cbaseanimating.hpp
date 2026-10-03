@@ -63,7 +63,7 @@ public:
 
 	NETVAR_ARRAY_LIMIT(m_flPoseParameter, "CBaseAnimating", "m_flPoseParameter", float, 24)
 
-	[[nodiscard]] CUtlVector<matrix3x4>* m_CachedBoneData();
+	[[nodiscard]] CUtlVector<matrix3x4>& m_CachedBoneData();
 
 	int* m_iMostRecentModelBoneCounter();
 	float* m_flLastBoneSetupTime();
