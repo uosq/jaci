@@ -4,8 +4,6 @@
 
 #include "../../thirdparty/csv/csv2.hpp"
 
-#include "../features/config/config.hpp"
-
 static uint32_t id_counter = 0;
 static std::vector<log_info> logs {};
 
@@ -28,9 +26,6 @@ const std::string& log_info::get_text() const
 
 void make_log(const std::string& text)
 {
-        if (!f_config.logs)
-                return;
-
         logs.emplace_back(log_info{text});
 }
 

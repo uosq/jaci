@@ -7,6 +7,8 @@
 
 #include "entity/entity.hpp"
 
+#include "../../thirdparty/simpleini/SimpleIni.h"
+
 class CUserCmd;
 class CWeapon;
 
@@ -20,6 +22,8 @@ enum class category
 class i_feature
 {
 public:
+	using base_class = i_feature;
+
 	virtual ~i_feature() = default;
 
 	virtual const char* get_name() const = 0;
@@ -39,6 +43,17 @@ public:
 
 	// usa para criar as opções no menu
 	virtual void on_imgui() {}
+
+	virtual bool on_save(CSimpleIniA& ini)
+	{
+		SI_Error err = ini.SetValue(get_name(), "enabled", std::to_string(enabled).c_str());
+		return err >= 0;
+	};
+
+	virtual void on_load(CSimpleIniA& ini)
+	{
+		enabled = ini.GetBoolValue(get_name(), "enabled", false);
+	};
 
 	bool enabled = false;
 };

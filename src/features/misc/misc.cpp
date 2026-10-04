@@ -14,13 +14,31 @@
 
 #include "../../logging/log.hpp"
 
+#include "../feature_register.hpp"
+
+class f_antiafk : public i_feature
+{
+public:
+	F_NAME_CATEGORY(Anti Afk, category::misc)
+	F_CREATEMOVE()
+	F_RESET()
+};
+
+class f_bhop : public i_feature
+{
+public:
+	F_NAME_CATEGORY(Bunny Hop, category::misc)
+	F_CREATEMOVE()
+	F_RESET()
+};
+
 static bool used_air_jump = false;
 static bool jump_released = false;
 static int afk_ticks = 0;
 
 void f_antiafk::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (local.index == -1 || !cmd || enabled)
+	if (local.index == -1 || !cmd || !enabled)
 		return;
 
 	static ConVar* mp_idlemaxtime = g_enginecvar->FindVar("mp_idlemaxtime");
@@ -55,6 +73,9 @@ void f_antiafk::on_reset()
 
 void f_bhop::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
+	if (!enabled)
+		return;
+
 	const bool wants_jump = (cmd->buttons & IN_JUMP) != 0;
 	const bool is_on_ground = local.player_flags.on_ground;
 	const bool is_scout = local.player_class == TF_CLASS_SCOUT;
@@ -98,3 +119,4 @@ void f_bhop::on_reset()
 
 REGISTER_FEATURE(f_antiafk)
 REGISTER_FEATURE(f_bhop)
+REGISTER_FEATURE(f_sv_pure_bypass)

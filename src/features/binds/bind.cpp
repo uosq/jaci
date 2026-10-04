@@ -105,3 +105,15 @@ void bind_s::draw(const char* name)
 
 	ImGui::PopID();
 }
+
+void bind_s::save(CSimpleIniA& ini, const char* section)
+{
+	ini.SetLongValue(section, "key_scancode", key);
+	ini.SetLongValue(section, "key_mode", static_cast<int>(mode));
+}
+
+void bind_s::load(CSimpleIniA& ini, const char* section)
+{
+	key = static_cast<ImGuiKey>(ini.GetLongValue(section, "key_scancode", ImGuiKey_None));
+	mode = static_cast<bind_mode_enum>(ini.GetLongValue(section, "key_mode", static_cast<int>(bind_mode_enum::off)));
+}

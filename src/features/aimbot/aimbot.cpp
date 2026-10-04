@@ -3,20 +3,23 @@
 //
 
 #include "aimbot.hpp"
-#include "../config/config.hpp"
 
 #include "../../classes/cusercmd.hpp"
 #include "../../classes/cweapon.hpp"
 
 #include "../gui/gui_utils.hpp"
 
-static int target_index = -1;
+#include "../binds/bind_manager.hpp"
 
 void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd);
 
+bind_s f_aimbot::key = {};
+int f_aimbot::fov = 0;
+int f_aimbot::target_index = -1;
+
 void f_aimbot::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (!enabled || !f_config.aimbot.key.active)
+	if (!enabled || !key.active)
 		return;
 
 	if (local.index == -1 || !weapon || !cmd)
@@ -35,18 +38,30 @@ void f_aimbot::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* 
 
 void f_aimbot::on_imgui()
 {
-	gui::bind("Key", f_config.aimbot.key);
-	gui::slider("Fov", &f_config.aimbot.fov, 0, 180, "Max fov");
+	gui::bind("Key", f_aimbot::key);
+	gui::slider("Fov", &f_aimbot::fov, 0, 180, "Max fov");
 }
 
-void f_aimbot::set_target_index(int index)
+bool f_aimbot::on_save(CSimpleIniA& ini)
 {
-	target_index = index;
+	if (!base_class::on_save(ini))
+		return false;
+
+	ini.SetLongValue(get_name(), "fov", f_aimbot::fov);
+	key.save(ini, get_name());
+
+	return true;
 }
 
-int f_aimbot::get_target_index()
+void f_aimbot::on_load(CSimpleIniA& ini)
 {
-	return target_index;
+	base_class::on_load(ini);
+	key.load(ini, get_name());
+}
+
+void f_aimbot::on_initialize()
+{
+	bind_manager::add_bind(f_aimbot::key);
 }
 
 REGISTER_FEATURE(f_aimbot)

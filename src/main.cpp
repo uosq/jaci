@@ -1,16 +1,41 @@
+#include <cstdlib>
+#include <filesystem>
 #include <thread>
 #include <dlfcn.h>
 #include <chrono>
 
 #include "features/feature_manager.hpp"
 #include "features/hook_manager/hookmanager.hpp"
-#include "features/binds/bind_manager.hpp"
-#include "features/config/config.hpp"
 
 #include "netvars/netvars.hpp"
 #include "logging/log.hpp"
 
 #include "interfaces/interfaces.hpp"
+
+static void save_default_config()
+{
+	const char* config_dir = getenv("XDG_CONFIG_HOME");
+
+	if (!config_dir)
+	{
+		make_log("XDG_CONFIG_HOME is null! wtf");
+		return;
+	}
+
+	CSimpleIniA ini;
+	
+	ini.SetUnicode(true);
+
+	auto& features = f_feature_manager::get().get_features();
+
+	for (auto& feature : features)
+		feature->on_load(ini);
+
+	std::string default_dir = std::string(config_dir) + "/jaci/configs";
+	std::filesystem::create_directory(default_dir);
+
+	ini.SaveFile((default_dir + "/default.ini").c_str());
+}
 
 __always_inline static void init()
 {
@@ -30,7 +55,6 @@ __always_inline static void init()
 		return;
 	}
 
-	bind_manager::add_bind(f_config.aimbot.key);
 	f_feature_manager::get().dispatch_initialize();
 
 	f_hook_manager.load_all_hooks();

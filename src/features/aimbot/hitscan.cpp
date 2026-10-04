@@ -174,7 +174,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 			target_angle = eye_pos.AngleTo(fallback_point);
 		}
 
-		if (const double fov = viewangles.GetFovTo(target_angle); fov < f_config.aimbot.fov && fov < closest_fov)
+		if (const double fov = viewangles.GetFovTo(target_angle); fov < f_aimbot::fov && fov < closest_fov)
 		{
 			target = player;
 			best_target_angle = target_angle;
@@ -191,5 +191,5 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	if (utils::shoot(lp, tg, weapon, cmd))
 		cmd->viewangles = best_target_angle;
 
-	f_aimbot::set_target_index(target.index);
+	f_aimbot::target_index = target.index;
 }

@@ -25,6 +25,8 @@
 
 static std::unordered_map<int, std::array<backtrack_record, 14>> player_records;
 
+int f_backtrack::max_ticks = 14;
+
 constexpr int BONE_USED_BY_HITBOX = 0x100;
 
 static float get_interp()
@@ -82,7 +84,7 @@ void f_backtrack::store()
 {
 	clear();
 
-	if (!f_config.backtrack.enabled)
+	if (!enabled)
 		return;
 
 	const entity_s& local = f_entitylist::get_local();
@@ -270,7 +272,7 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 		int ticks = 0;
 		for (auto& record : *records)
 		{
-			if (ticks >= f_config.backtrack.max_ticks)
+			if (ticks >= f_backtrack::max_ticks)
 				break;
 
 			if (!is_record_valid(record))
@@ -299,6 +301,9 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 
 void f_backtrack::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
+	if (!enabled)
+		return;
+
 	manual_aiming(cmd, local);
 }
 
@@ -309,7 +314,7 @@ void f_backtrack::on_reset()
 
 void f_backtrack::on_imgui()
 {
-	gui::slider("Max Ticks", &f_config.backtrack.max_ticks, 0, 14);
+	gui::slider("Max Ticks", &f_backtrack::max_ticks, 0, 14);
 }
 
 void f_backtrack::on_frame_stage_notify_before(int stage)

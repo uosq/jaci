@@ -54,5 +54,8 @@ public:
 #define F_SECTION(section) \
 	const char* get_section() const override { return #section; };
 
+#define F_LOAD_UNLOAD() \
+	bool on_save(CSimpleIniA& ini) override; \
+	void on_load(CSimpleIniA& ini) override;
 
 #endif

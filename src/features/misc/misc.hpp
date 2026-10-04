@@ -7,22 +7,11 @@
 
 #include "../feature_register.hpp"
 
-class CUserCmd;
-
-class f_antiafk : public i_feature
+// gotta register the f_sv_pure_bypass::enabled
+class f_sv_pure_bypass : public i_feature
 {
 public:
-	F_NAME_CATEGORY(AntiAfk, category::misc)
-	F_CREATEMOVE()
-	F_RESET()
-};
-
-class f_bhop : public i_feature
-{
-public:
-	F_NAME_CATEGORY(Bunny Hop, category::misc)
-	F_CREATEMOVE()
-	F_RESET()
+        F_NAME_CATEGORY(sv_pure bypass, category::misc)
 };
 
 #endif //JACI_MISC_HPP

@@ -46,6 +46,8 @@ public:
 	void manual_aiming(CUserCmd* cmd, const entity_s& local);
 
 	void debug_draw_records();
+
+	static int max_ticks;
 };
 
 #endif //JACI_BACKTRACK_HPP

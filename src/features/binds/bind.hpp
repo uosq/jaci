@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "../../../thirdparty/imgui/imgui.h"
+#include "../../../thirdparty/simpleini/SimpleIni.h"
 
 enum class bind_mode_enum : uint8_t
 {
@@ -27,6 +28,8 @@ struct bind_s
 
 	void update();
 	void draw(const char* name);
+	void save(CSimpleIniA& ini, const char* section);
+	void load(CSimpleIniA& ini, const char* section);
 };
 
 #endif //JACI_BIND_S_HPP
