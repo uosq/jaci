@@ -98,6 +98,8 @@ public:
 	[[nodiscard]] bool is_alive();
 	[[nodiscard]] Vec3 get_eye_pos();
 	[[nodiscard]] bool in_cond(int cond);
+	[[nodiscard]] bool is_taunting();
+	[[nodiscard]] bool is_ghost();
 };
 
 enum ETFCond

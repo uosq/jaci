@@ -6,6 +6,7 @@
 #define JACI_ENTITY_HPP
 #include <cstdint>
 
+#include "../../classes/cbaseentity.hpp"
 #include "../../classes/cweapon.hpp"
 #include "../../classes/defs.hpp"
 #include "../../classes/vector3.hpp"
@@ -77,6 +78,7 @@ struct entity_s
 
 	[[nodiscard]] Vec3 get_center() const;
 	[[nodiscard]] CWeapon* get_weapon() const;
+	[[nodiscard]] CBaseEntity* get_entity() const;
 };
 
 #endif //JACI_ENTITY_HPP

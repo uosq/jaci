@@ -50,3 +50,13 @@ bool CPlayer::in_cond(const int cond)
 			return false;
 	}
 }
+
+bool CPlayer::is_taunting()
+{
+	return in_cond(TF_COND_TAUNTING);
+}
+
+bool CPlayer::is_ghost()
+{
+	return in_cond(TF_COND_HALLOWEEN_GHOST_MODE);
+}

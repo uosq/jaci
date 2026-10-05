@@ -146,6 +146,21 @@ static void initialize_surface()
 		make_log("g_surface is null");
 }
 
+static void initialize_vphysics()
+{
+	if (g_vphysics)
+		return;
+
+	g_vphysics = GetInterface<IPhysics>("vphysics.so", VPHYSICS_INTERFACE_VERSION);
+	g_vphysics_collide = GetInterface<IPhysicsCollision>("vphysics.so", VPHYSICS_COLLISION_INTERFACE_VERSION);
+
+	if (!g_vphysics)
+		make_log("g_physics is null");
+
+	if (!g_vphysics_collide)
+		make_log("g_vphysics_collide is null");
+}
+
 bool initialize_interfaces()
 {
 	initialize_globalvars();
@@ -159,11 +174,13 @@ bool initialize_interfaces()
 	initialize_engineclient();
 	initialize_enginecvar();
 	initialize_surface();
+	initialize_vphysics();
 
 	return	g_globalvars && g_input
 		&& g_clientstate && g_demoplayer
 		&& g_demorecorder && g_modelinfoclient
 		&& g_client && g_cliententitylist
 		&& g_engineclient && g_enginecvar
-		&& g_surface && g_enginetrace;
+		&& g_surface && g_enginetrace
+		&& g_vphysics && g_vphysics_collide;
 }

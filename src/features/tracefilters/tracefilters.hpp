@@ -30,6 +30,7 @@ public:
 	TraceType_t GetTraceType() const override;
 
 	std::function<bool(IHandleEntity* handle_entity, int contents_mask)> callback;
+	TraceType_t trace_type;
 };
 
 #endif //GUARACI_TRACEFILTERS_HPP

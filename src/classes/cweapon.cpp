@@ -170,6 +170,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.offset.z = bDucking ? 8 : -3;
 			info.damage_radius = id == TF_WEAPON_ROCKETLAUNCHER ? 146 : 44;
 			info.simple_trace  = true;
+
 			return true;
 		}
 
@@ -182,6 +183,9 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed = bIsCowMangler ? 1100 : 1200;
 			info.hull = bIsCowMangler ? Vec3(0, 0, 0) : Vec3(1, 1, 1);
 			info.simple_trace = true;
+
+			info.uses_vphysics = true;
+
 			return true;
 		}
 
@@ -194,6 +198,9 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 					       "mult_projectile_range", this);
 			info.gravity = flGravity;
 			info.offset.Set(16, 8, -6);
+
+			info.uses_vphysics = true;
+
 			return true;
 		}
 
@@ -206,6 +213,9 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			    utils::remap_val(0, 0, utils::attribute_hook_value(4.0f, "stickybomb_charge_rate", this),
 					   900, 2400, true),
 			    "mult_projectile_range", this);
+
+			info.uses_vphysics = true;
+
 			return true;
 		}
 
@@ -216,6 +226,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed    = utils::attribute_hook_value(2000, "mult_projectile_speed", this);
 			info.gravity  = 0.01f;
 			info.lifetime = 0.3f * flGravity;
+			info.uses_vphysics = true;
 			return true;
 		}
 
@@ -224,6 +235,8 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.offset.Set(23.5, 12, bDucking ? 8 : -3);
 			info.hull.Set(0, 0, 0);
 			info.speed = 3000;
+			info.uses_vphysics = true;
+
 			return true;
 		}
 
@@ -240,6 +253,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed    = utils::remap_val(charge, 0, 1, 1800, 2600);
 			info.gravity  = utils::remap_val(charge, 0, 1, 0.5, 0.1) * flGravity;
 			info.lifetime = 10;
+
 			return true;
 		}
 
@@ -252,6 +266,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed    = 2400;
 			info.gravity  = flGravity * 0.2f;
 			info.lifetime = 10;
+
 			return true;
 		}
 
@@ -261,6 +276,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.hull.Set(1, 1, 1);
 			info.speed   = 1000;
 			info.gravity = 0.3f * flGravity;
+
 			return true;
 		}
 
@@ -276,6 +292,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed	  = 1000;
 			info.lifetime	  = 0.285;
 			info.simple_trace = true;
+
 			return true;
 		}
 
@@ -287,6 +304,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.lifetime	  = 0.18;
 			info.gravity	  = 0;
 			info.simple_trace = true;
+
 			return true;
 		}
 
@@ -296,6 +314,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.hull.Set(1, 1, 10); // wtf is this 10?
 			info.gravity  = 1;
 			info.lifetime = 2.2;
+
 			return true;
 		}
 
@@ -306,6 +325,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.speed				    = tf_scout_stunball_base_speed->GetFloat();
 			info.gravity				    = 1;
 			info.lifetime				    = flGravity;
+
 			return true;
 		}
 
@@ -317,6 +337,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.gravity  = 1;
 			info.lifetime = 2.2;
 			info.hull.Set(3, 3, 3);
+
 			return true;
 		}
 
@@ -327,6 +348,7 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.gravity  = 1;
 			info.lifetime = 2.2;
 			info.hull.Set(3, 3, 3);
+
 			return true;
 		}
 
@@ -336,14 +358,13 @@ bool CWeapon::get_projectile_info(ProjectileInfo_t& info)
 			info.hull.Set(17, 17, 7);
 			info.speed   = 500;
 			info.gravity = 1 * flGravity;
+
 			return true;
 		}
 
 		default:
-			break;
+			return false;
 	}
-
-	return false;
 }
 
 bool CWeapon::is_melee()

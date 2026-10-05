@@ -15,6 +15,7 @@
 #include "../classes/icvar.hpp"
 #include "../classes/vgui_surface030.hpp"
 #include "../classes/ienginetrace.hpp"
+#include "../classes/vphysics_interface.hpp"
 
 inline CGlobalVars* g_globalvars = nullptr;
 inline CInput* g_input = nullptr;
@@ -28,5 +29,7 @@ inline IVEngineClient014* g_engineclient = nullptr;
 inline ICvar* g_enginecvar = nullptr;
 inline ISurface* g_surface = nullptr;
 inline IEngineTrace* g_enginetrace = nullptr;
+inline IPhysics* g_vphysics = nullptr;
+inline IPhysicsCollision* g_vphysics_collide = nullptr;
 
 bool initialize_interfaces();

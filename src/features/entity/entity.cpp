@@ -30,3 +30,13 @@ CWeapon* entity_s::get_weapon() const
 
 	return nullptr;
 }
+
+CBaseEntity* entity_s::get_entity() const
+{
+	if (index == -1)
+		return nullptr;
+
+	CBaseEntity* self = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(index));
+
+	return self ? self : nullptr;
+}

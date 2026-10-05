@@ -27,7 +27,7 @@ static bool is_shooting_hitscan(CWeapon* weapon, const CUserCmd* cmd)
 
 bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (!local || !target || !cmd || !weapon)
+	if (!local || !cmd || !target || !weapon)
 		return false;
 
 	const int def_index = weapon->m_iItemDefinitionIndex();
@@ -75,7 +75,6 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 				case TF_WEAPON_SNIPERRIFLE:
 				case TF_WEAPON_SNIPERRIFLE_DECAP: // bazaar's bargain
 				{
-
 #if 0
 					if (f_settings->data.aimbot.wait_for_charge)
 					{
@@ -177,6 +176,14 @@ bool utils::shoot(CPlayer* local, CBaseEntity* target, CWeapon* weapon, CUserCmd
 					// charge
 					cmd->buttons |= IN_ATTACK;
 					return false;
+				}
+
+				case TF_WEAPON_FLAME_BALL:
+				{
+					CDragonFury* dragon = reinterpret_cast<CDragonFury*>(weapon);
+
+					cmd->buttons |= IN_ATTACK;
+					return dragon->can_dragon_primary_attack();
 				}
 
 				default:

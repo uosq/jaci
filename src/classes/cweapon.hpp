@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "cbaseentity.hpp"
 #include "cbasehandle.hpp"
 #include "weaponinfo.hpp"
@@ -18,12 +20,15 @@ enum class WeaponType
 
 struct ProjectileInfo_t
 {
-	float speed	    = 0;
-	float gravity	    = 0;
-	float primetime	    = 0;
+	float speed = 0;
+	float gravity = 0;
+	float primetime = 0;
 	float damage_radius = 0;
-	float lifetime	    = 60.0f;
-	bool simple_trace   = false;
+	float lifetime = 60.0f;
+
+	bool simple_trace = false;
+	bool uses_vphysics = false;
+
 	Vec3 offset{};
 	Vec3 hull{6, 6, 6};
 };

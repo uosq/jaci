@@ -2,8 +2,6 @@
 // Created by tevin on 07/09/2026.
 //
 
-#include "../config/config.hpp"
-
 #include "../../classes/cusercmd.hpp"
 #include "../../classes/ctfplayer.hpp"
 #include "../../classes/ctrace.hpp"

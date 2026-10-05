@@ -7,6 +7,7 @@
 #include "features/feature_manager.hpp"
 #include "features/hook_manager/hookmanager.hpp"
 
+#include "features/prediction/prediction.hpp"
 #include "netvars/netvars.hpp"
 #include "logging/log.hpp"
 
@@ -56,6 +57,7 @@ __always_inline static void init()
 	}
 
 	f_feature_manager::get().dispatch_initialize();
+	init_projectile();
 
 	f_hook_manager.load_all_hooks();
 }
