@@ -90,6 +90,18 @@ public:
 			feature->on_frame_stage_notify_before(stage);
 	}
 
+	void dispatch_imgui()
+	{
+		for (auto& feature : features)
+			feature->on_imgui();
+	}
+
+	void dispatch_imgui_background(ImDrawList* draw)
+	{
+		for (auto& feature : features)
+			feature->on_imgui_background(draw);
+	}
+
 private:
 	// i fucking hate shared pointers but i couldn't get this shit
 	// to work without them

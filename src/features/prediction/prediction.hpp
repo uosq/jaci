@@ -4,8 +4,7 @@
 
 #ifndef GUARACI_PREDICTION_HPP
 #define GUARACI_PREDICTION_HPP
-#include "../../classes/vector3.hpp"
-#include "../../classes/cweapon.hpp"
+#include "../../classes/cbaseentity.hpp"
 
 class CPlayer;
 

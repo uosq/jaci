@@ -12,6 +12,15 @@
 
 [[nodiscard]] int get_window_flags(bool open);
 
+enum class side_enum
+{
+	none = 0,
+	left,
+	right,
+	top,
+	bottom,
+};
+
 namespace gui
 {
 	void window(const char* id, std::function<void()> content);
@@ -30,6 +39,10 @@ namespace gui
 
 	void child(const char* id, std::function<void()> content);
 	void bind(const char* id, bind_s& bind);
+
+	void color_edit3(const char* text, float* color);
+
+	void side(const char* id, side_enum& value);
 }
 
 #endif //GUARACI_GUI_UTILS_HPP

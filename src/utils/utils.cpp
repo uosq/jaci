@@ -288,13 +288,16 @@ bool utils::world_to_screen(const Vec3& pos, Vec3* screen_point)
 	if (w < 0.001f)
 		return false;
 
-	int width, height;
-	g_engineclient->GetScreenSize(width, height);
-
-	const float dbw = 1 / w;
-
-	screen_point->x = (static_cast<float>(width)/2.0f) + ((vm[0][0] * pos.x + vm[0][1] * pos.y + vm[0][2] * pos.z + vm[0][3]) * dbw) * static_cast<float>(width)/2.0f + 0.5f;
-	screen_point->y = (static_cast<float>(height)/2.0f) - ((vm[1][0] * pos.x + vm[1][1] * pos.y + vm[1][2] * pos.z + vm[1][3]) * dbw) * static_cast<float>(height)/2.0f + 0.5f;
+	if (screen_point)
+	{
+		int width, height;
+		g_engineclient->GetScreenSize(width, height);
+	
+		const float dbw = 1.0f / w;
+	
+		screen_point->x = (static_cast<float>(width)/2.0f) + ((vm[0][0] * pos.x + vm[0][1] * pos.y + vm[0][2] * pos.z + vm[0][3]) * dbw) * static_cast<float>(width)/2.0f + 0.5f;
+		screen_point->y = (static_cast<float>(height)/2.0f) - ((vm[1][0] * pos.x + vm[1][1] * pos.y + vm[1][2] * pos.z + vm[1][3]) * dbw) * static_cast<float>(height)/2.0f + 0.5f;
+	}
 
 	return true;
 }

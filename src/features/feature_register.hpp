@@ -38,6 +38,9 @@ public:
 #define F_IMGUI() \
 	void on_imgui() override;
 
+#define F_IMGUI_BACKGROUND() \
+	virtual void on_imgui_background(ImDrawList* draw) override;
+
 #define F_RESET() \
 	void on_reset() override;
 

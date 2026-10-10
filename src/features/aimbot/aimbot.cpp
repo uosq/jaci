@@ -32,9 +32,6 @@ static bool can_run(f_aimbot* aimbot, const entity_s& local, CWeapon* weapon, CU
 	if (!f_aimbot::key.active)
 		return false;
 
-	if (!utils::is_in_match())
-		return false;
-
 	if (local.index == -1)
 		return false;
 
@@ -87,7 +84,7 @@ bool f_aimbot::on_save(CSimpleIniA& ini)
 	if (!base_class::on_save(ini))
 		return false;
 
-	ini.SetLongValue(get_name(), "fov", f_aimbot::fov);
+	ini.SetLongValue(get_name(), "fov", fov);
 	key.save(ini, get_name());
 
 	return true;
@@ -97,6 +94,7 @@ void f_aimbot::on_load(CSimpleIniA& ini)
 {
 	base_class::on_load(ini);
 	key.load(ini, get_name());
+	fov = ini.GetLongValue(get_name(), "fov", 0);
 }
 
 void f_aimbot::on_initialize()

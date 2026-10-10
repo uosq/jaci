@@ -28,43 +28,6 @@ static objectparams_t g_PhysDefaultObjectParams =
 		true,// enable collisions?
 };
 
-static CTrace trace_world_props(CBaseEntity* localplayer, CBaseEntity* target, const Vec3& start_pos, const Vec3& end_pos, const Vec3& mins, const Vec3& maxs)
-{
-	CTrace trace;
-	dynamic_trace_filter filter([&](IHandleEntity* handle, int contents_mask) -> bool
-	{
-		if (!handle || handle == localplayer || handle == target)
-			return false;
-
-		if (handle->GetRefEHandle().GetSerialNumber() == (1<<15))
-			return contents_mask & CONTENTS_SOLID && handle->GetRefEHandle().GetEntryIndex() != -1; // -1 is client sided shit so fuck them
-
-		auto entity = reinterpret_cast<CBaseEntity*>(handle);
-
-		switch(entity->GetClassID())
-		{
-			case ETFClassID::CBaseEntity: return contents_mask & CONTENTS_SOLID;
-			case ETFClassID::CFunc_LOD:
-			case ETFClassID::CBaseDoor:
-			case ETFClassID::CDynamicProp:
-			case ETFClassID::CPhysicsProp:
-			case ETFClassID::CPhysicsPropMultiplayer:
-			case ETFClassID::CObjectCartDispenser:
-			case ETFClassID::CFuncTrackTrain:
-			case ETFClassID::CFuncConveyor: return contents_mask & CONTENTS_MOVEABLE;
-			case ETFClassID::CFuncRespawnRoomVisualizer: return contents_mask & CONTENTS_PLAYERCLIP;
-
-			default: return false;
-		}
-	});
-
-	filter.trace_type = TRACE_EVERYTHING_FILTER_PROPS;
-
-	utils::trace_hull(start_pos, end_pos, mins, maxs, MASK_SHOT, &filter, &trace);
-
-	return trace;
-}
-
 void init_projectile()
 {
 	phys_env = g_vphysics->CreateEnvironment();
@@ -102,6 +65,10 @@ bool simulate_projectile(projectile_sim_info& info)
 
 	bool ret = true;
 
+	CTrace trace;
+	collideable_trace_filter filter;
+	filter.skip = {info.local};
+
 	for (float clock = 0.0f; clock < info.duration; clock += timestep)
 	{
 		Vec3 current_pos, current_angle;
@@ -114,7 +81,7 @@ bool simulate_projectile(projectile_sim_info& info)
 		Vec3 new_pos, new_angle;
 		phys_obj->GetPosition(&new_pos, &new_angle);
 
-		CTrace trace = trace_world_props(info.local, info.target, current_pos, new_pos, info.mins, info.maxs);
+		utils::trace_hull(current_pos, new_pos, info.mins, info.maxs, MASK_SHOT_HULL, &filter, &trace);
 
 		if (trace.DidHit())
 		{

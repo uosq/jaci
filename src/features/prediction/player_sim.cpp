@@ -94,7 +94,8 @@ static void begin_prediction(CPlayer *player, float seconds)
 	static ConVar *sv_stopspeed = g_enginecvar->FindVar("sv_stopspeed");
 	static ConVar *sv_bounce = g_enginecvar->FindVar("sv_bounce");
 
-	m_filter.skip = m_pTarget = player;
+	m_pTarget = player;
+	m_filter.skip = {m_pTarget};
 
 	m_flAccelerate		   = sv_accelerate->GetFloat();
 	m_flGravity		   = get_gravity();
@@ -154,7 +155,7 @@ static void end_prediction()
 	m_bIsOnGround	     = false;
 	m_bIsStarted	     = false;
 
-	m_filter.skip	     = nullptr;
+	m_filter.skip.clear();
 }
 
 static bool simulate(Vec3& out)
@@ -639,7 +640,7 @@ static void try_touch_ground(const Vec3 &start, const Vec3 &end, const Vec3 &min
 static void stay_on_ground()
 {
 	CTrace trace;
-	m_filter.skip = m_pTarget;
+	m_filter.skip = {m_pTarget};
 
 	Vec3 vecStart{m_vecAbsOrigin};
 	Vec3 vecEnd{m_vecAbsOrigin};

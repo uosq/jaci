@@ -14,7 +14,7 @@ std::string CPlayer::get_name() const
 	if (!g_engineclient->GetPlayerInfo(entindex(), &pi))
 		return "";
 
-	return {pi.name};
+	return pi.name;
 }
 
 bool CPlayer::is_tf_bot() const

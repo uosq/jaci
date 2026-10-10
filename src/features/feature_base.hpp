@@ -8,6 +8,7 @@
 #include "entity/entity.hpp"
 
 #include "../../thirdparty/simpleini/SimpleIni.h"
+#include "../../thirdparty/imgui/imgui.h"
 
 class CUserCmd;
 class CWeapon;
@@ -42,7 +43,8 @@ public:
 	virtual void on_frame_stage_notify_after(int stage) {};
 
 	// usa para criar as opções no menu
-	virtual void on_imgui() {}
+	virtual void on_imgui() {};
+	virtual void on_imgui_background(ImDrawList* draw) {};
 
 	virtual bool on_save(CSimpleIniA& ini)
 	{
@@ -54,6 +56,9 @@ public:
 	{
 		enabled = ini.GetBoolValue(get_name(), "enabled", false);
 	};
+
+	static void save_imvec4(const char* name, CSimpleIniA& ini, ImVec4& vec);
+	static ImVec4 load_imvec4(const char* name, CSimpleIniA& ini);
 
 	bool enabled = false;
 };

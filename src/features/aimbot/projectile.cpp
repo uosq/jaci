@@ -50,48 +50,15 @@ static weapon_hit_point_enum get_weapon_default_hit_point(CWeapon* weapon)
 	}
 }
 
-static CTrace trace_world_props(CBaseEntity* localplayer, CBaseEntity* target, const Vec3& start_pos, const Vec3& end_pos, const Vec3& mins, const Vec3& maxs)
-{
-	CTrace trace;
-	dynamic_trace_filter filter([&](IHandleEntity* handle, int contents_mask) -> bool
-	{
-		if (!handle || handle == localplayer || handle == target)
-			return false;
-
-		if (handle->GetRefEHandle().GetSerialNumber() == (1<<15))
-			return contents_mask & CONTENTS_SOLID && handle->GetRefEHandle().GetEntryIndex() != -1; // -1 is client sided shit so fuck them
-
-		auto entity = reinterpret_cast<CBaseEntity*>(handle);
-
-		switch(entity->GetClassID())
-		{
-			case ETFClassID::CBaseEntity: return contents_mask & CONTENTS_SOLID;
-			case ETFClassID::CFunc_LOD:
-			case ETFClassID::CBaseDoor:
-			case ETFClassID::CDynamicProp:
-			case ETFClassID::CPhysicsProp:
-			case ETFClassID::CPhysicsPropMultiplayer:
-			case ETFClassID::CObjectCartDispenser:
-			case ETFClassID::CFuncTrackTrain:
-			case ETFClassID::CFuncConveyor: return contents_mask & CONTENTS_MOVEABLE;
-			case ETFClassID::CFuncRespawnRoomVisualizer: return contents_mask & CONTENTS_PLAYERCLIP;
-
-			default: return false;
-		}
-	});
-
-	filter.trace_type = TRACE_EVERYTHING_FILTER_PROPS;
-
-	utils::trace_hull(start_pos, end_pos, mins, maxs, MASK_SHOT, &filter, &trace);
-
-	return trace;
-}
-
 static bool solve_ballistic_arc(Vector &outAngle, const Vector p0, const Vector p1, float flSpeed,
 					  float flGravity)
 {
 	Vector diff = p1 - p0;
 	float dx = diff.Length2D();
+
+	if (dx < 0.001f) // prevent division by 0 which is not great
+		return false;
+
 	float dy = diff.z;
 	float speed2 = flSpeed * flSpeed;
 	float g = flGravity;
@@ -111,12 +78,6 @@ static bool solve_ballistic_arc(Vector &outAngle, const Vector p0, const Vector 
 
 void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (local.index == -1 || !weapon || !cmd)
-		return;
-
-	if (!f_aimbot::key.active)
-		return;
-
 	ProjectileInfo_t projectile_info;
 	if (!weapon->get_projectile_info(projectile_info))
 		return;
@@ -170,12 +131,10 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	if (target.index == -1)
 		return;
 
-	CPlayer* tg = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(target.index));
+	CPlayer* tg = reinterpret_cast<CPlayer*>(target.get_entity());
 
 	if (!tg)
 		return;
-
-	f_aimbot::target_index = target.index;
 
 	const float required_time = target_distance / projectile_info.speed;
 
@@ -183,6 +142,7 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	if (target.type == entity_type_enum::Player)
 	{
 		simulate_player(predicted_pos, tg, required_time);
+		predicted_pos.z += 2.0f;
 	}
 
 	if (hit_point == weapon_hit_point_enum::head)
@@ -190,7 +150,10 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	else if (hit_point == weapon_hit_point_enum::chest)
 		predicted_pos.z += target.maxs.z * 0.5f;
 	else
-		predicted_pos.z += target.maxs.z * 0.1f;
+	{
+		const float min_height = projectile_info.hull.z + 2.0f; // 2.0f is a **MAGIC** number, i just need it to not clip the fucking ground
+		predicted_pos.z += min_height;
+	}
 
 	Vec3 angle = eye_pos.AngleTo(predicted_pos);
 
@@ -200,11 +163,18 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	const Vec3 start_pos = eye_pos + (forward * projectile_info.offset.x) + (right * projectile_info.offset.y) + (up * projectile_info.offset.z);
 	Vec3 mins{ -projectile_info.hull.x, -projectile_info.hull.y, -projectile_info.hull.z };
 
+	target_distance = start_pos.DistanceTo(predicted_pos);
+
 	if (projectile_info.simple_trace)
 	{
-		CTrace trace = trace_world_props(localplayer, tg, start_pos, start_pos + (forward * target_distance), mins, projectile_info.hull);
-		if (trace.DidHit())
-		return;
+		CTrace trace;
+		collideable_trace_filter filter;
+		filter.skip = {localplayer};
+
+		utils::trace_hull(start_pos, start_pos + (forward * target_distance), mins, projectile_info.hull, MASK_SHOT_HULL, &filter, &trace);
+
+		if (trace.DidHit() && trace.m_pEnt != tg)
+			return;
 	}
 	else
 	{
@@ -235,4 +205,6 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 		cmd->viewangles = angle;
 		sendpacket = false;
 	}
+
+	f_aimbot::target_index = target.index;
 }

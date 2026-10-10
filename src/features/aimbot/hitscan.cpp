@@ -100,7 +100,7 @@ static bool is_visible_point(CPlayer* local, const entity_s& target, const Vec3&
 {
 	CTrace trace;
 	target_trace_filter filter;
-	filter.skip = local;
+	filter.skip = {local};
 
 	utils::trace_line(eye_pos, target_point, MASK_SHOT | CONTENTS_HITBOX, &filter, &trace);
 

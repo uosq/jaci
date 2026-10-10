@@ -99,7 +99,7 @@ static void render_category_tab(category cat)
 
 static void draw_main_window()
 {
-	gui::window("Jaci", []()
+	gui::window("lololol", []()
 	{
 		// why can't we just loop over the category enum? this is dumb
 		constexpr category categories[] = {category::aimbot, category::misc, category::visuals};
@@ -145,6 +145,11 @@ void draw_gui()
 	toggle_menu_visibility();
 
 	bind_manager::update_binds();
+
+	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+
+	if (drawlist)
+		f_feature_manager::get().dispatch_imgui_background(drawlist);
 
 	if (is_open) draw_main_window();
 

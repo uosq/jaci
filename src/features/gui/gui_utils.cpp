@@ -116,3 +116,37 @@ void gui::bind(const char* id, bind_s& bind)
 {
 	bind.draw(id);
 }
+
+void gui::color_edit3(const char* text, float* color)
+{
+	ImGui::ColorEdit3(text, color);
+}
+
+static const char* side_text(side_enum value)
+{
+	switch(value)
+	{
+		case side_enum::none: return "None";
+		case side_enum::left: return "Left";
+		case side_enum::right: return "Right";
+		case side_enum::top: return "Top";
+		case side_enum::bottom: return "Bottom";
+	}
+}
+
+void gui::side(const char* id, side_enum& value)
+{
+	constexpr int sides_count = 5;
+	constexpr std::string_view sides[sides_count] = {"None", "Left", "Right", "Top", "Bottom"};
+
+	const char* text = side_text(value);
+
+	if (ImGui::BeginCombo(id, text))
+	{
+		for (int i = 0; i < sides_count; i++)
+			if (ImGui::Selectable(sides[i].data()))
+				value = static_cast<side_enum>(i);
+
+		ImGui::EndCombo();
+	}
+}

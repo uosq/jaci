@@ -6,6 +6,7 @@
 #define GUARACI_TRACEFILTERS_HPP
 
 #include <functional>
+#include <vector>
 
 #include "../../classes/ienginetrace.hpp"
 
@@ -17,7 +18,7 @@ public:
 	bool ShouldHitEntity(IHandleEntity* handle_entity, int contents_mask) override;
 	TraceType_t GetTraceType() const override;
 
-	CBaseEntity* skip { nullptr }; // entity we should skip (probably local player)
+	std::vector<CBaseEntity*> skip;
 	int team { -1 }; // -1 is every team, anything else, and it will only search for entities in that team
 };
 
@@ -31,6 +32,15 @@ public:
 
 	std::function<bool(IHandleEntity* handle_entity, int contents_mask)> callback;
 	TraceType_t trace_type;
+};
+
+class collideable_trace_filter : public ITraceFilter
+{
+public:
+	bool ShouldHitEntity(IHandleEntity* handle_entity, int contents_mask) override;
+	TraceType_t GetTraceType() const override { return TRACE_EVERYTHING; };
+
+	std::vector<CBaseEntity*> skip;
 };
 
 #endif //GUARACI_TRACEFILTERS_HPP
