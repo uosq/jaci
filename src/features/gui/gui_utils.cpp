@@ -112,7 +112,7 @@ void gui::child(const char* id, std::function<void()> content)
 	ImGui::EndChild();
 }
 
-void gui::bind(const char* id, bind_s& bind)
+void gui::bind(const char* id, CBind& bind)
 {
 	bind.draw(id);
 }
@@ -131,6 +131,7 @@ static const char* side_text(side_enum value)
 		case side_enum::right: return "Right";
 		case side_enum::top: return "Top";
 		case side_enum::bottom: return "Bottom";
+		default: return "Unknown";
 	}
 }
 

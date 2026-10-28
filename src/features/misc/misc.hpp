@@ -5,13 +5,19 @@
 #ifndef JACI_MISC_HPP
 #define JACI_MISC_HPP
 
-#include "../feature_register.hpp"
+class CUserCmd;
+class CPlayer;
 
-// gotta register the f_sv_pure_bypass::enabled
-class f_sv_pure_bypass : public i_feature
+class CMisc
 {
 public:
-        F_NAME_CATEGORY(sv_pure bypass, category::misc)
+        static void CreateMove(CPlayer* localplayer, CUserCmd* cmd);
+        static void Gui();
+        static void Reset();
+
+        static bool antiafk;
+        static bool bhop;
+        static bool sv_pure_bypass;
 };
 
 #endif //JACI_MISC_HPP

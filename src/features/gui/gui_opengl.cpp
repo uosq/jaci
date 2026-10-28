@@ -2,7 +2,7 @@
 // Created by tevin on 29/06/2026.
 //
 
-#include "../../abstract/igui.hpp"
+#include "gui.hpp"
 
 #include "../../../thirdparty/imgui/imgui.h"
 #include "../../../thirdparty/imgui/imgui_impl_opengl3.h"
@@ -13,22 +13,12 @@
 
 extern SDL_Window* sdl_window;
 
-class CGuiOpenGL final : public IGui
-{
-public:
-	void init() override;
-	void render() override;
-	void reset() override;
+static SDL_GLContext game_context = nullptr;
+static SDL_GLContext our_context = nullptr;
 
-private:
-	bool initialized = false;
-	SDL_GLContext game_context = nullptr;
-	SDL_GLContext our_context = nullptr;
-};
-
-void CGuiOpenGL::init()
+void CGui::InitOpenGL()
 {
-	if (initialized)
+	if (CGui::IsInitialized())
 		return;
 
 	if (!ImGui::GetCurrentContext())
@@ -43,12 +33,12 @@ void CGuiOpenGL::init()
 	ImGui_ImplSDL2_InitForOpenGL(sdl_window, nullptr);
 	ImGui_ImplOpenGL3_Init();
 
-	initialized = true;
+	CGui::SetInitialized(true);
 }
 
-void CGuiOpenGL::render()
+void CGui::RenderOpenGL()
 {
-	if (!initialized)
+	if (!CGui::IsInitialized())
 		return;
 
 	SDL_GL_MakeCurrent(sdl_window, our_context);
@@ -57,7 +47,7 @@ void CGuiOpenGL::render()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	draw_gui();
+	CGui::DrawGui();
 
 	ImGui::EndFrame();
 	ImGui::Render();
@@ -66,20 +56,14 @@ void CGuiOpenGL::render()
 	SDL_GL_MakeCurrent(sdl_window, game_context);
 }
 
-void CGuiOpenGL::reset()
+void CGui::ResetOpenGL()
 {
-	if (!initialized)
+	if (!CGui::IsInitialized())
 		return;
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 
 	game_context = nullptr;
-	initialized = false;
-}
-
-IGui* create_opengl_renderer()
-{
-	static CGuiOpenGL gui;
-	return &gui;
+	CGui::SetInitialized(false);
 }

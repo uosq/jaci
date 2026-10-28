@@ -10,28 +10,28 @@
 
 #include "../../logging/log.hpp"
 
-struct hook_manager
+struct CHookManager
 {
 	using HookFn = void(*)();
 
-	explicit hook_manager();
-	void add_hook(HookFn fn);
-	void load_all_hooks() const;
-	funchook* get_funchook();
+	explicit CHookManager();
+	void AddHook(HookFn fn);
+	void LoadAllHooks() const;
+	funchook* GetFunchook();
 };
 
-inline hook_manager f_hook_manager {};
+extern CHookManager f_hook_manager;
 
 struct hook_register
 {
-	explicit hook_register(const hook_manager::HookFn fn)
+	explicit hook_register(const CHookManager::HookFn fn)
 	{
-		f_hook_manager.add_hook(fn);
+		f_hook_manager.AddHook(fn);
 	}
 };
 
 #define REGISTER_HOOK(fn) hook_register Hook_## fn {fn};
-#define PREPARE_HOOK(original_fn, hook_fn) funchook_prepare(f_hook_manager.get_funchook(), reinterpret_cast<void**>(&(original_fn)), reinterpret_cast<void*>(hook_fn))
+#define PREPARE_HOOK(original_fn, hook_fn) funchook_prepare(f_hook_manager.GetFunchook(), reinterpret_cast<void**>(&(original_fn)), reinterpret_cast<void*>(hook_fn))
 
 #define INIT_HOOK(name, ret, args, module, signature) \
 	using name## Fn = ret(*) args; \

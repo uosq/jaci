@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PID=$(pidof -s tf_linux64)
-SO="$PWD/build/libjaci.so"
+SO="$PWD/build/debug/libJaci.so"
 
 if [ ! -f "$SO" ]; then
 	echo "No shared object found inside the build folder!"

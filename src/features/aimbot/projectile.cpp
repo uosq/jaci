@@ -12,7 +12,6 @@
 #include "../../utils/utils.hpp"
 
 #include "../entitylist/entitylist.hpp"
-#include "../entity/entity.hpp"
 
 #include "../tracefilters/tracefilters.hpp"
 
@@ -76,86 +75,99 @@ static bool solve_ballistic_arc(Vector &outAngle, const Vector p0, const Vector 
 	return true;
 }
 
-void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+static CPlayer* find_best_player(CPlayer* localplayer, const weapon_hit_point_enum hit_point, const int localteam, bool can_target_teammates, const Vec3& eye_pos, const Vec3& viewangles, float& closest_fov)
 {
-	ProjectileInfo_t projectile_info;
-	if (!weapon->get_projectile_info(projectile_info))
-		return;
+	CPlayer* target = nullptr;
 
-	CPlayer* localplayer = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
-	if (!localplayer)
-		return;
-
-	const Vec3 viewangles = g_engineclient->GetViewAngles();
-	const Vec3 eye_pos = localplayer->get_eye_pos();
-
-	entity_s target;
-	float target_distance = 0.0f;
-	float closest_fov = std::numeric_limits<float>::max();
-
-	const bool can_target_teammates = weapon->can_hit_teammates();
-	const weapon_hit_point_enum hit_point = get_weapon_default_hit_point(weapon);
-
-	for (const auto& player : f_entitylist::get_players())
+	for (CPlayer* player : CEntityList::GetPlayers())
 	{
-		if (!player.is_alive)
+		if (!player)
+			continue;
+		
+		if (!player->is_alive())
 			continue;
 
-		if (player.index == local.index || (player.team == local.team && !can_target_teammates))
+		if (player != localplayer || (player->m_iTeamNum() == localteam && !can_target_teammates))
 			continue;
 
-		CPlayer* player_entity = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(player.index));
+		Vec3 hit_offset = Vec3{ 0.0f, 0.0f, 0.0f };
+		const Vec3 maxs = player->m_vecMaxs();
 
-		if (!player_entity)
-			continue;
-
-		Vec3 hit_offset{ 0.0f, 0.0f, 0.0f };
 		if (hit_point == weapon_hit_point_enum::head)
-			hit_offset = player_entity->m_vecViewOffset();
+			hit_offset = player->m_vecViewOffset();
 		else if (hit_point == weapon_hit_point_enum::chest)
-			hit_offset.z = player.maxs.z * 0.5f;
+			hit_offset.z = maxs.z * 0.5f;
 		else
-			hit_offset.z = player.maxs.z * 0.1f;
+			hit_offset.z = maxs.z * 0.1f;
 
-		const Vec3 target_aim_pos = player.pos + hit_offset;
+		const Vec3 target_aim_pos = player->GetAbsOrigin() + hit_offset;
 		const Vec3 angle = eye_pos.AngleTo(target_aim_pos);
 
-		if (float fov = viewangles.GetFovTo(angle); fov < f_aimbot::fov && fov < closest_fov)
+		if (float fov = viewangles.GetFovTo(angle); fov < CAimbot::fov && fov < closest_fov)
 		{
 			target = player;
 			closest_fov = fov;
-			target_distance = eye_pos.DistanceTo(target_aim_pos);
 		}
 	}
 
-	if (target.index == -1)
-		return;
+	return target;
+}
 
-	CPlayer* tg = reinterpret_cast<CPlayer*>(target.get_entity());
+static Vec3 predict_player(CPlayer* target, const Vec3& start_pos, const ProjectileInfo_t& projectile_info, const float required_time_seconds, const weapon_hit_point_enum hit_point)
+{
+	Vec3 predicted_pos = start_pos;
 
-	if (!tg)
-		return;
-
-	const float required_time = target_distance / projectile_info.speed;
-
-	Vec3 predicted_pos = target.pos;
-	if (target.type == entity_type_enum::Player)
-	{
-		simulate_player(predicted_pos, tg, required_time);
-		predicted_pos.z += 2.0f;
-	}
+	simulate_player(predicted_pos, target, required_time_seconds);
+	predicted_pos.z += 2.0f;
 
 	if (hit_point == weapon_hit_point_enum::head)
-		predicted_pos += tg->m_vecViewOffset();
+		predicted_pos += target->m_vecViewOffset();
 	else if (hit_point == weapon_hit_point_enum::chest)
-		predicted_pos.z += target.maxs.z * 0.5f;
+		predicted_pos.z += target->m_vecMaxs().z * 0.5f;
 	else
 	{
 		const float min_height = projectile_info.hull.z + 2.0f; // 2.0f is a **MAGIC** number, i just need it to not clip the fucking ground
 		predicted_pos.z += min_height;
 	}
 
-	Vec3 angle = eye_pos.AngleTo(predicted_pos);
+	return predicted_pos;
+}
+
+void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
+{
+	if (!localplayer)
+		return;
+
+	ProjectileInfo_t projectile_info;
+	if (!weapon->get_projectile_info(projectile_info))
+		return;
+
+	const Vec3 viewangles = g_engineclient->GetViewAngles();
+	const Vec3 eye_pos = localplayer->get_eye_pos();
+
+	float target_distance = 0.0f;
+	float closest_fov = std::numeric_limits<float>::max();
+
+	const bool can_target_teammates = weapon->can_hit_teammates();
+	const weapon_hit_point_enum hit_point = get_weapon_default_hit_point(weapon);
+
+	const int localindex = localplayer->entindex();
+	const int localteam = localplayer->m_iTeamNum();
+
+	CPlayer* best_player = find_best_player(localplayer, hit_point, localteam, can_target_teammates, eye_pos, viewangles, closest_fov);
+	CBaseEntity* target = best_player; // hack
+
+	if (!target)
+		return;
+
+	const float required_time = target_distance / projectile_info.speed;
+
+	Vec3 hit_position = target->GetAbsOrigin();
+
+	if (target->is_player())
+		hit_position = predict_player(reinterpret_cast<CPlayer*>(target), hit_position, projectile_info, required_time, hit_point);
+
+	Vec3 angle = eye_pos.AngleTo(hit_position);
 
 	Vec3 forward, right, up;
 	angle.AngleVectors(&forward, &right, &up);
@@ -163,7 +175,7 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 	const Vec3 start_pos = eye_pos + (forward * projectile_info.offset.x) + (right * projectile_info.offset.y) + (up * projectile_info.offset.z);
 	Vec3 mins{ -projectile_info.hull.x, -projectile_info.hull.y, -projectile_info.hull.z };
 
-	target_distance = start_pos.DistanceTo(predicted_pos);
+	target_distance = start_pos.DistanceTo(hit_position);
 
 	if (projectile_info.simple_trace)
 	{
@@ -173,7 +185,7 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 
 		utils::trace_hull(start_pos, start_pos + (forward * target_distance), mins, projectile_info.hull, MASK_SHOT_HULL, &filter, &trace);
 
-		if (trace.DidHit() && trace.m_pEnt != tg)
+		if (trace.DidHit() && trace.m_pEnt != target)
 			return;
 	}
 	else
@@ -181,13 +193,13 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 		static ConVar* sv_gravity = g_enginecvar->FindVar("sv_gravity");
 		const float gravity = sv_gravity->GetFloat() * projectile_info.gravity;
 
-		if (!solve_ballistic_arc(angle, start_pos, predicted_pos, projectile_info.speed, gravity))
+		if (!solve_ballistic_arc(angle, start_pos, hit_position, projectile_info.speed, gravity))
 			return;
 
 		projectile_sim_info sim_info;
 		{
 			sim_info.local = localplayer;
-			sim_info.target = tg;
+			sim_info.target = target;
 			sim_info.duration = required_time;
 			sim_info.projectile_speed = projectile_info.speed;
 			sim_info.initial_angle = angle;
@@ -200,11 +212,11 @@ void aimbot_projectile(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 			return;
 	}
 
-	if (utils::shoot(localplayer, tg, weapon, cmd))
+	if (utils::shoot(localplayer, target, weapon, cmd))
 	{
 		cmd->viewangles = angle;
 		sendpacket = false;
 	}
 
-	f_aimbot::target_index = target.index;
+	CAimbot::target_index = target->entindex();
 }

@@ -5,13 +5,12 @@
 #ifndef JACI_BACKTRACK_HPP
 #define JACI_BACKTRACK_HPP
 
-#include "../../classes/cusercmd.hpp"
 #include "../../classes/matrix3x4.hpp"
 #include "../../classes/vector3.hpp"
 
-#include "../entity/entity.hpp"
-
-#include "../feature_register.hpp"
+class CPlayer;
+class CWeapon;
+class CUserCmd;
 
 struct backtrack_record
 {
@@ -26,28 +25,33 @@ struct backtrack_record
 	backtrack_record() : bones{} {}
 };
 
-class f_backtrack : public i_feature
+class CBacktrack
 {
 public:
-	F_NAME_CATEGORY(Backtrack, category::misc)
-	F_CREATEMOVE()
-	F_RESET()
-	F_IMGUI()
-	F_FRAMESTAGE_BEFORE()
+	static bool enabled;
+	static int max_ticks;
 
-	void store();
+	static const char* GetName() { return "Backtrack"; };
 
-	void clear();
-	bool is_record_valid(const backtrack_record& record);
-	std::array<backtrack_record, 14>* get_records(const entity_s& target);
-	void set_record(CUserCmd* cmd, const backtrack_record& record);
+	// events
+	static void CreateMove(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd);
+	static void Reset();
+	static void Gui();
+
+	// call before FrameStageNotify
+	static void Before_FrameStageNotify();
+
+	static void Store();
+
+	static void Clear();
+	static bool IsRecordValid(const backtrack_record& record);
+	static std::array<backtrack_record, 14>* GetRecords(const CPlayer* target);
+	static void SetRecord(CUserCmd* cmd, const backtrack_record& record);
 
 	// we shoot the backtrack ourselves
-	void manual_aiming(CUserCmd* cmd, const entity_s& local);
+	static void ManualAim(CUserCmd* cmd, CPlayer* local);
 
-	void debug_draw_records();
-
-	static int max_ticks;
+	static void Debug_DrawRecords();
 };
 
 #endif //JACI_BACKTRACK_HPP

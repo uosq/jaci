@@ -8,10 +8,12 @@
 
 static constexpr size_t MAX_HOOKS = 512;
 
-funchook* fh { nullptr };
-std::vector<hook_manager::HookFn> hooks {};
+CHookManager f_hook_manager {};
 
-hook_manager::hook_manager()
+static funchook* fh = nullptr;
+static std::vector<CHookManager::HookFn> hooks;
+
+CHookManager::CHookManager()
 {
 	fh = funchook_create();
 
@@ -22,7 +24,7 @@ hook_manager::hook_manager()
 	}
 }
 
-void hook_manager::add_hook(const HookFn fn)
+void CHookManager::AddHook(const HookFn fn)
 {
 	if (hooks.size() >= MAX_HOOKS)
 	{
@@ -33,7 +35,7 @@ void hook_manager::add_hook(const HookFn fn)
 	hooks.emplace_back(fn);
 }
 
-void hook_manager::load_all_hooks() const
+void CHookManager::LoadAllHooks() const
 {
 	if (fh == nullptr)
 	{
@@ -57,7 +59,7 @@ void hook_manager::load_all_hooks() const
 	}
 }
 
-funchook* hook_manager::get_funchook()
+funchook* CHookManager::GetFunchook()
 {
 	return fh;
 }

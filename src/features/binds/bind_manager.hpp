@@ -6,10 +6,11 @@
 #define JACI_BIND_MANAGER_HPP
 #include "bind.hpp"
 
-namespace bind_manager
+class CBindManager
 {
-	void add_bind(struct bind_s& bind);
-	void update_binds();
-}
+public:
+	static void AddBind(struct CBind& bind);
+	static void UpdateBinds();
+};
 
 #endif //JACI_BIND_MANAGER_HPP

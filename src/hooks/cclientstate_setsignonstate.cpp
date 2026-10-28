@@ -7,7 +7,9 @@
 
 #include "../features/hook_manager/hookmanager.hpp"
 #include "../features/entitylist/entitylist.hpp"
-#include "../features/feature_manager.hpp"
+#include "../features/backtrack/backtrack.hpp"
+#include "../features/esp/esp.hpp"
+#include "../features/misc/misc.hpp"
 
 INIT_HOOK(SetSignonState, void, (void* self, int state, int count), "engine.so", "55 48 89 E5 41 57 41 56 41 89 D6 41 55 41 54 49 89 FC 53 89 F3")
 {
@@ -15,8 +17,10 @@ INIT_HOOK(SetSignonState, void, (void* self, int state, int count), "engine.so",
 
 	if (state == SIGNONSTATE_FULL)
 	{
-		f_entitylist::reset();
-		f_feature_manager::get().dispatch_reset();
+		CEntityList::Reset();
+		CBacktrack::Reset();
+		CEsp::Reset();
+		CMisc::Reset();
 
 		if (utils::is_in_match())
 			make_log("Joined a match");

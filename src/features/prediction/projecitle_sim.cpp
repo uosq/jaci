@@ -1,7 +1,6 @@
 #include "prediction.hpp"
 
 #include "../../classes/vphysics_interface.hpp"
-#include "../../classes/cbaseentity.hpp"
 #include "../../classes/bspflags.hpp"
 
 #include "../../interfaces/interfaces.hpp"

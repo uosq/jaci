@@ -6,7 +6,7 @@
 #include "../../thirdparty/d3d9/windows_base.h"
 
 #include "../features/hook_manager/hookmanager.hpp"
-#include "../abstract/igui.hpp"
+#include "../features/gui/gui.hpp"
 
 LPDIRECT3DDEVICE9 d3d_device = nullptr;
 
@@ -32,8 +32,8 @@ INIT_HOOK(D3D9SwapChainEx_Present, HRESULT, (IDirect3DSwapChain9Ex* swapchain, c
 
 	if (d3d_device)
 	{
-		f_gui()->init();
-		f_gui()->render();
+		CGui::Initialize();
+		CGui::Render();
 	}
 
 	return original_D3D9SwapChainEx_Present(swapchain, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
@@ -44,7 +44,7 @@ INIT_HOOK(D3D9DeviceEx_Reset, HRESULT, (LPDIRECT3DDEVICE9 device, D3DPRESENT_PAR
 {
 	const auto ret = original_D3D9DeviceEx_Reset(device, pPresentationParamters);
 
-	f_gui()->reset();
+	CGui::Reset();
 	d3d_device = device;
 
 	return ret;

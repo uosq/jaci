@@ -3,25 +3,29 @@
 
 #include "../../../thirdparty/imgui/imgui.h"
 
-#include "../feature_register.hpp"
 #include "../gui/gui_utils.hpp"
 
-struct f_esp : i_feature
+class CEsp
 {
-	F_NAME_CATEGORY(ESP, category::visuals)
-	F_IMGUI()
-	F_IMGUI_BACKGROUND()
-	F_FRAMESTAGE_BEFORE()
-	F_RESET()
-	F_LOAD_UNLOAD()
-
+public:
+	static bool enabled;
 	static ImVec4 red_team_color;
 	static ImVec4 blu_team_color;
 	static side_enum name;
-
 	static bool localplayer;
-
 	static int font_size;
+
+	static const char* GetName() { return "ESP"; };
+
+	static void Gui();
+	static void GuiBackground(ImDrawList* draw);
+
+	static void Before_FrameStageNotify();
+
+	static void Reset();
+
+	static bool Save(CSimpleIniA& ini);
+	static void Load(CSimpleIniA& ini);
 };
 
 #endif

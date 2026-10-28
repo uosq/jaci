@@ -4,7 +4,7 @@
 
 #include "backtrack.hpp"
 
-#include "../config/config.hpp"
+#include "../../classes/cusercmd.hpp"
 
 #include "../../../thirdparty/imgui/imgui.h"
 
@@ -25,7 +25,8 @@
 
 static std::unordered_map<int, std::array<backtrack_record, 14>> player_records;
 
-int f_backtrack::max_ticks = 14;
+int CBacktrack::max_ticks = 14;
+bool CBacktrack::enabled = false;
 
 constexpr int BONE_USED_BY_HITBOX = 0x100;
 
@@ -38,7 +39,7 @@ static float get_interp()
 	return std::max(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / cl_updaterate->GetFloat());
 }
 
-bool f_backtrack::is_record_valid(const backtrack_record& record)
+bool CBacktrack::IsRecordValid(const backtrack_record& record)
 {
 	if (record.sim_time == -1.0f)
 		return false;
@@ -63,54 +64,51 @@ bool f_backtrack::is_record_valid(const backtrack_record& record)
 	return std::fabs(delta) <= 0.2f;
 }
 
-void f_backtrack::clear()
+void CBacktrack::Clear()
 {
 	for (auto& [index, records] : player_records)
 	{
 		for (auto& record : records)
 		{
-			if (record.sim_time != -1.0f && !is_record_valid(record))
+			if (record.sim_time != -1.0f && !IsRecordValid(record))
 				record.sim_time = -1.0f;
 		}
 	}
 }
 
-static bool is_valid_player(const entity_s& player, const int& local_team, const int& local_index)
+static bool is_valid_player(CPlayer* player, const int& local_team, const int& local_index)
 {
-	return player.index != -1 && player.index != local_index && player.team != local_team && player.is_alive;
+	return player && player->entindex() != local_index && player->m_iTeamNum() != local_team && player->is_alive();
 }
 
-void f_backtrack::store()
+void CBacktrack::Store()
 {
-	clear();
+	Clear();
 
 	if (!enabled)
 		return;
 
-	const entity_s& local = f_entitylist::get_local();
+	CPlayer* local = CEntityList::GetLocalPlayer();
 
-	if (local.index == -1)
+	if (!local)
 		return;
 
-	auto players = f_entitylist::get_players();
+	auto players = CEntityList::GetPlayers();
 
 	if (players.empty())
 		return;
 
-	const int& local_team = local.team;
-	const int& local_index = local.index;
+	const int& local_team = local->m_iTeamNum();
+	const int& local_index = local->entindex();
 
-	for (const entity_s& player : players)
+	for (auto& player : players)
 	{
 		if (!is_valid_player(player, local_team, local_index))
 			continue;
 
-		auto* entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(player.index));
-		if (!entity) continue;
+		auto& records = player_records[player->entindex()];
 
-		auto& records = player_records[player.index];
-
-		if (records[0].sim_time == player.sim_time)
+		if (records[0].sim_time == player->m_flSimulationTime())
 			continue;
 
 		// shift records right
@@ -118,26 +116,26 @@ void f_backtrack::store()
 		// drops record[13] so we can have a new one
 		std::rotate(records.rbegin(), records.rbegin() + 1, records.rend());
 
-		records[0].sim_time = player.sim_time;
-		records[0].origin = player.pos;
-		records[0].mins = player.mins;
-		records[0].maxs = player.maxs;
+		records[0].sim_time = player->m_flSimulationTime();
+		records[0].origin = player->GetAbsOrigin();
+		records[0].mins = player->m_vecMins();
+		records[0].maxs = player->m_vecMaxs();
 
-		entity->SetupBones(records[0].bones, 128, BONE_USED_BY_HITBOX, g_globalvars->curtime);
+		player->SetupBones(records[0].bones, 128, BONE_USED_BY_HITBOX, g_globalvars->curtime);
 	}
 }
 
-std::array<backtrack_record, 14>* f_backtrack::get_records(const entity_s& target)
+std::array<backtrack_record, 14>* CBacktrack::GetRecords(const CPlayer* target)
 {
-	return player_records.contains(target.index) ? &player_records[target.index] : nullptr;
+	return player_records.contains(target->entindex()) ? &player_records[target->entindex()] : nullptr;
 }
 
-void f_backtrack::debug_draw_records()
+void CBacktrack::Debug_DrawRecords()
 {
 	if (!utils::is_in_match())
 		return;
 
-	auto players = f_entitylist::get_players();
+	auto players = CEntityList::GetPlayers();
 
 	if (players.empty())
 		return;
@@ -147,7 +145,7 @@ void f_backtrack::debug_draw_records()
 
 	for (const auto& player : players)
 	{
-		const auto records = get_records(player);
+		const auto records = GetRecords(player);
 
 		if (!records)
 			continue;
@@ -167,7 +165,7 @@ void f_backtrack::debug_draw_records()
 	}
 }
 
-void f_backtrack::set_record(CUserCmd* cmd, const backtrack_record& record)
+void CBacktrack::SetRecord(CUserCmd* cmd, const backtrack_record& record)
 {
 	if (record.sim_time == -1.0f)
 		return;
@@ -175,13 +173,8 @@ void f_backtrack::set_record(CUserCmd* cmd, const backtrack_record& record)
 	cmd->tick_count = TIME_TO_TICKS(record.sim_time + get_interp());
 }
 
-static bool is_backtrack_record_visible(const backtrack_record& record, const entity_s& target, const Vec3& eye_pos, CPlayer* local)
+static bool is_backtrack_record_visible(const backtrack_record& record, CPlayer* target, const Vec3& eye_pos, CPlayer* local)
 {
-	CBaseEntity* target_ent = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
-
-	if (!target_ent)
-		return false;
-
 	// filter only world and props
 	dynamic_trace_filter filter
 	{
@@ -224,13 +217,15 @@ static bool is_backtrack_record_visible(const backtrack_record& record, const en
 	return trace.fraction == 1.0f;
 }
 
-void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
+void CBacktrack::ManualAim(CUserCmd* cmd, CPlayer* localplayer)
 {
-	CPlayer* localplayer = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
-	if (!localplayer) return;
+	if (!localplayer)
+		return;
 
-	CWeapon* weapon = localplayer->m_hActiveWeapon().Get();
-	if (!weapon) return;
+	CWeapon* weapon = localplayer->GetWeapon();
+
+	if (!weapon)
+		return;
 
 	if (weapon->get_weapon_type() != WeaponType::HITSCAN)
 		return;
@@ -243,12 +238,12 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 	// janky ahh shit
 	Vec3 eye_pos = localplayer->get_eye_pos();
 
-	auto players = f_entitylist::get_players();
+	auto players = CEntityList::GetPlayers();
 
 	if (players.empty())
 		return;
 
-	const uint8_t local_team = local.team;
+	const uint8_t local_team = localplayer->m_iTeamNum();
 	const Vec3 viewangles = g_engineclient->GetViewAngles();
 
 	// i don't like this
@@ -256,15 +251,18 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 	float closest_fov = 30.0f;
 	backtrack_record* chosen_record = nullptr;
 
-	for (const auto& player : players)
+	for (auto& player : players)
 	{
-		if (player.team == local_team)
+		if (!player)
 			continue;
 
-		if (!player.is_alive)
+		if (player->m_iTeamNum() == local_team)
 			continue;
 
-		auto records = get_records(player);
+		if (!player->is_alive())
+			continue;
+
+		auto records = GetRecords(player);
 
 		if (!records)
 			continue;
@@ -272,10 +270,10 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 		int ticks = 0;
 		for (auto& record : *records)
 		{
-			if (ticks >= f_backtrack::max_ticks)
+			if (ticks >= CBacktrack::max_ticks)
 				break;
 
-			if (!is_record_valid(record))
+			if (!IsRecordValid(record))
 				continue;
 
 			if (!is_backtrack_record_visible(record, player, eye_pos, localplayer))
@@ -296,33 +294,29 @@ void f_backtrack::manual_aiming(CUserCmd* cmd, const entity_s& local)
 	if (!chosen_record)
 		return;
 
-	set_record(cmd, *chosen_record);
+	SetRecord(cmd, *chosen_record);
 }
 
-void f_backtrack::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+void CBacktrack::CreateMove(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
 {
 	if (!enabled)
 		return;
 
-	manual_aiming(cmd, local);
+	ManualAim(cmd, localplayer);
 }
 
-void f_backtrack::on_reset()
+void CBacktrack::Reset()
 {
 	player_records.clear();
 }
 
-void f_backtrack::on_imgui()
+void CBacktrack::Gui()
 {
-	gui::slider("Max Ticks", &f_backtrack::max_ticks, 0, 14);
+	gui::checkbox("Enabled", &CBacktrack::enabled);
+	gui::slider("Max Ticks", &CBacktrack::max_ticks, 0, 14);
 }
 
-void f_backtrack::on_frame_stage_notify_before(int stage)
+void CBacktrack::Before_FrameStageNotify()
 {
-	if (stage != FRAME_NET_UPDATE_END) [[likely]]
-		return;
-
-	store();
+	Store();
 }
-
-REGISTER_FEATURE(f_backtrack)

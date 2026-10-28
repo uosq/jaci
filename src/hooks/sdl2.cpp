@@ -2,11 +2,12 @@
 // Created by tevin on 29/06/2026.
 //
 
+#include <SDL2/SDL.h>
 #include <dlfcn.h>
 
 #include "../../thirdparty/imgui/imgui_impl_sdl2.h"
 
-#include "../abstract/igui.hpp"
+#include "../features/gui/gui.hpp"
 #include "../features/hook_manager/hookmanager.hpp"
 
 SDL_Window* sdl_window = nullptr;
@@ -15,8 +16,8 @@ INIT_DLSYM_HOOK(SwapWindow, void, (SDL_Window* window), "libSDL2-2.0.so.0", "SDL
 {
 	sdl_window = window;
 
-	f_gui()->init();
-	f_gui()->render();
+	CGui::Initialize();
+	CGui::Render();
 
 	original_SwapWindow(window);
 }
@@ -45,7 +46,7 @@ INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_Pol
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
 
-		if (is_gui_open())
+		if (CGui::IsOpen())
 		{
 			const ImGuiIO& io = ImGui::GetIO();
 

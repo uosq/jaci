@@ -2,7 +2,8 @@
 #include <dlfcn.h>
 #include <chrono>
 
-#include "features/feature_manager.hpp"
+#include "features/aimbot/aimbot.hpp"
+#include "features/gui/gui.hpp"
 #include "features/hook_manager/hookmanager.hpp"
 
 #include "features/prediction/prediction.hpp"
@@ -29,10 +30,11 @@ __always_inline static void init()
 		return;
 	}
 
-	f_feature_manager::get().dispatch_initialize();
+	CGui::Initialize();
+	CAimbot::Initialize();
 	init_projectile();
 
-	f_hook_manager.load_all_hooks();
+	f_hook_manager.LoadAllHooks();
 }
 
 extern "C" void __attribute__((visibility("default"))) InitLoucura()

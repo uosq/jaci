@@ -38,7 +38,7 @@ namespace gui
 	void tab(const char* id, std::function<void()> content);
 
 	void child(const char* id, std::function<void()> content);
-	void bind(const char* id, bind_s& bind);
+	void bind(const char* id, CBind& bind);
 
 	void color_edit3(const char* text, float* color);
 

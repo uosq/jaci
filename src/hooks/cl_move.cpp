@@ -7,17 +7,20 @@
 #include "../classes/protocol.hpp"
 #include "../classes/con_nprint.hpp"
 #include "../classes/cusercmd.hpp"
+#include "../classes/ctfplayer.hpp"
 
 #include "../utils/mem.hpp"
-
-#include "../features/entitylist/entitylist.hpp"
-#include "../features/hook_manager/hookmanager.hpp"
-#include "../features/feature_manager.hpp"
 
 #include "../interfaces/interfaces.hpp"
 
 #include "../logging/log.hpp"
 #include "../utils/utils.hpp"
+
+#include "../features/entitylist/entitylist.hpp"
+#include "../features/hook_manager/hookmanager.hpp"
+#include "../features/aimbot/aimbot.hpp"
+#include "../features/backtrack/backtrack.hpp"
+#include "../features/misc/misc.hpp"
 
 // yes, a global so I can modify it anywhere
 bool sendpacket = true;
@@ -30,11 +33,15 @@ static void CreateMove(const int sequence_number)
 	if (!utils::is_in_match())
 		return;
 
-	if (const entity_s localplayer = f_entitylist::get_local(); localplayer.index != -1)
+	if (auto* localplayer = CEntityList::GetLocalPlayer(); localplayer)
 	{
-		CWeapon* weapon = localplayer.get_weapon();
+		CMisc::CreateMove(localplayer, cmd);
 
-		f_feature_manager::get().dispatch_create_move(localplayer, weapon, cmd);
+		if (CWeapon* weapon = localplayer->GetWeapon(); weapon)
+		{
+			CAimbot::CreateMove(localplayer, weapon, cmd);
+			CBacktrack::CreateMove(localplayer, weapon, cmd);
+		}
 	}
 }
 

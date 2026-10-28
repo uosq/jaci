@@ -60,3 +60,26 @@ bool CPlayer::is_ghost()
 {
 	return in_cond(TF_COND_HALLOWEEN_GHOST_MODE);
 }
+
+CWeapon* CPlayer::GetWeapon()
+{
+	return m_hActiveWeapon().Get();
+}
+
+const char* CPlayer::GetClassName()
+{
+	switch(m_iClass())
+	{
+		case TF_CLASS_SCOUT: return "Scout";
+		case TF_CLASS_SNIPER: return "Sniper";
+		case TF_CLASS_SOLDIER: return "Soldier";
+		case TF_CLASS_DEMOMAN: return "Demoman";
+		case TF_CLASS_MEDIC: return "Medic";
+		case TF_CLASS_HEAVYWEAPONS: return "Heavy";
+		case TF_CLASS_PYRO: return "Pyro";
+		case TF_CLASS_SPY: return "Spy";
+		case TF_CLASS_ENGINEER: return "Engineer";
+
+		default: return "Unknown Player Class";
+	}
+}

@@ -23,6 +23,8 @@ public:
 	NETVAR(m_hOwnerEntity, "CBaseEntity", "m_hOwnerEntity", CHandle<CBaseEntity>)
 	NETVAR(m_flSimulationTime, "CBaseEntity", "m_flSimulationTime", float)
 
+	static CBaseEntity* GetEntity(int entindex);
+
 	__always_inline bool is_player()
 	{
 		return GetClassID() == ETFClassID::CTFPlayer;

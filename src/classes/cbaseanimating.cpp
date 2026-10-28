@@ -18,9 +18,10 @@ CUtlVector<matrix3x4>& CBaseAnimating::m_CachedBoneData()
 	/*
 		xref: GetBoneCache
 
-		We want the 0x16f offset inside C_BaseAnimating::GetBoneCache
+		preciso do 0x16f pra funcionar essa bosta
+		ta em C_BaseAnimating::GetBoneCache
 
-			local_40 = self[0x16f];
+======>			local_40 = self[0x16f];
 			local_38 = gpGlobals->curtime;
 			local_34 = 0x100;
 			local_48 = pStudioHdr;

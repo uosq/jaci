@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <limits.h>
+#include <linux/limits.h>
 #ifdef _WIN32
 #include <windows.h>
 #ifndef PATH_MAX

@@ -13,7 +13,6 @@
 #include "../../utils/utils.hpp"
 
 #include "../entitylist/entitylist.hpp"
-#include "../entity/entity.hpp"
 
 #include "../tracefilters/tracefilters.hpp"
 
@@ -53,20 +52,16 @@ static default_hit_point get_weapon_default_hit_point(CWeapon* weapon)
 	return default_hit_point::pelvis;
 }
 
-static Vec3 get_weapon_default_hitpoint_position(const entity_s& target, const default_hit_point& hit_point)
+static Vec3 get_weapon_default_hitpoint_position(CBaseEntity* target, const default_hit_point& hit_point)
 {
-	if (target.index == -1)
-		return INVALID_VEC3;
-
-	auto* entity = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
-	if (!entity) return INVALID_VEC3;
+	if (!target) { return INVALID_VEC3; }
 
 	// not gonna store it as we can get it from m_CachedBoneData
 	// do we even need to setup bones? doesn't the game already have them setup at this point?? CHECKKK
 	//if(!entity->SetupBones(NULL, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, g_globalvars->curtime))
 		//return INVALID_VEC3;
 
-	auto* animating = reinterpret_cast<CBaseAnimating*>(entity);
+	auto* animating = reinterpret_cast<CBaseAnimating*>(target);
 	auto& bone_cache = animating->m_CachedBoneData();
 
 	if (!bone_cache.Base() || bone_cache.Count() <= 0)
@@ -96,7 +91,7 @@ static Vec3 get_weapon_default_hitpoint_position(const entity_s& target, const d
 	return target_pos;
 }
 
-static bool is_visible_point(CPlayer* local, const entity_s& target, const Vec3& target_point, const Vec3& eye_pos)
+static bool is_visible_point(CPlayer* local, CBaseEntity* target, const Vec3& target_point, const Vec3& eye_pos)
 {
 	CTrace trace;
 	target_trace_filter filter;
@@ -104,13 +99,13 @@ static bool is_visible_point(CPlayer* local, const entity_s& target, const Vec3&
 
 	utils::trace_line(eye_pos, target_point, MASK_SHOT | CONTENTS_HITBOX, &filter, &trace);
 
-	return trace.DidHit() && trace.m_pEnt && trace.m_pEnt->entindex() == target.index;
+	return trace.DidHit() && trace.m_pEnt && trace.m_pEnt == target;
 }
 
 // default hit position was not visible
 // so we gotta find a new one now
 // shit
-static bool find_visible_point(CPlayer* local, CBaseAnimating* target_animating, const entity_s& target, const Vec3& eye_pos, Vec3& out)
+static bool find_visible_point(CPlayer* local, CBaseAnimating* target_animating, CBaseEntity* target, const Vec3& eye_pos, Vec3& out)
 {
 	constexpr hitbox_enum valid_hitboxes[] = {HITBOX_SPINE1, HITBOX_SPINE2, HITBOX_SPINE3, HITBOX_LEFT_UPPERARM, HITBOX_RIGHT_UPPERARM};
 
@@ -133,25 +128,28 @@ static bool find_visible_point(CPlayer* local, CBaseAnimating* target_animating,
 	return false;
 }
 
-void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+void CAimbot::AimHitscan(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
 {
-	CPlayer* localplayer = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
-	if (!localplayer) return;
-
 	Vec3 eye_pos = localplayer->get_eye_pos();
-	const auto players = f_entitylist::get_players();
+	const auto players = CEntityList::GetPlayers();
 	if (players.empty()) return;
 
 	auto default_hit_point = get_weapon_default_hit_point(weapon);
 	Vec3 best_target_angle;
-	entity_s target;
+	CBaseEntity* target = nullptr;
 	double closest_fov = std::numeric_limits<double>::max();
 
 	const Vec3 viewangles = g_engineclient->GetViewAngles();
+	
+	const int localindex = localplayer->entindex();
+	const int localteam = localplayer->m_iTeamNum();
 
 	for (auto& player : players)
 	{
-		if (player.index == local.index || player.team == local.team)
+		if (!player)
+			continue;
+
+		if (player->entindex() == localindex || player->m_iTeamNum() == localteam)
 			continue;
 
 		Vec3 hit_position = get_weapon_default_hitpoint_position(player, default_hit_point);
@@ -162,8 +160,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 
 		if (!is_visible_point(localplayer, player, hit_position, eye_pos))
 		{
-			CBaseAnimating* player_ent = reinterpret_cast<CBaseAnimating*>(g_cliententitylist->GetClientEntity(player.index));
-			if (!player_ent) continue;
+			CBaseAnimating* player_ent = reinterpret_cast<CBaseAnimating*>(player);
 
 			Vec3 fallback_point;
 			if (!find_visible_point(localplayer, player_ent, player, eye_pos, fallback_point))
@@ -172,7 +169,7 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 			target_angle = eye_pos.AngleTo(fallback_point);
 		}
 
-		if (const double fov = viewangles.GetFovTo(target_angle); fov < f_aimbot::fov && fov < closest_fov)
+		if (const double fov = viewangles.GetFovTo(target_angle); fov < CAimbot::fov && fov < closest_fov)
 		{
 			target = player;
 			best_target_angle = target_angle;
@@ -180,14 +177,11 @@ void aimbot_hitscan(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
 		}
 	}
 
-	if (target.index == -1)
+	if (!target)
 		return;
 
-	auto* lp = reinterpret_cast<CPlayer*>(g_cliententitylist->GetClientEntity(local.index));
-	auto* tg = reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(target.index));
-
-	if (utils::shoot(lp, tg, weapon, cmd))
+	if (utils::shoot(localplayer, target, weapon, cmd))
 		cmd->viewangles = best_target_angle;
 
-	f_aimbot::target_index = target.index;
+	CAimbot::target_index = target->entindex();
 }

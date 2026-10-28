@@ -7,55 +7,55 @@
 #include <string_view>
 #include <fmt/base.h>
 
-void bind_s::update()
+void CBind::update()
 {
-	if (key == ImGuiKey_None)
+	if (m_key == ImGuiKey_None)
 	{
-		active = false;
-		toggle_state = false;
+		m_active = false;
+		m_toggle_state = false;
 		return;
 	}
 
-	switch (mode)
+	switch (m_mode)
 	{
 		case bind_mode_enum::off:
-			active = false;
-			toggle_state = false;
+			m_active = false;
+			m_toggle_state = false;
 			break;
 		case bind_mode_enum::hold:
-			active = ImGui::IsKeyDown(key);
-			toggle_state = false;
+			m_active = ImGui::IsKeyDown(m_key);
+			m_toggle_state = false;
 			break;
 		case bind_mode_enum::toggle:
-			if (ImGui::IsKeyPressed(key))
-				toggle_state = !toggle_state;
+			if (ImGui::IsKeyPressed(m_key))
+				m_toggle_state = !m_toggle_state;
 
-			active = toggle_state;
+			m_active = m_toggle_state;
 			break;
 		case bind_mode_enum::always:
-			active = true;
-			toggle_state = false;
+			m_active = true;
+			m_toggle_state = false;
 			break;
 	}
 }
 
-static void push_key_popup(bind_s& bind)
+static void push_key_popup(CBind& bind)
 {
 	if (ImGui::BeginPopup("BindModePopup"))
 	{
 		ImGui::TextDisabled("Bind Mode");
 		ImGui::Separator();
 
-		if (ImGui::Selectable("Off", bind.mode == bind_mode_enum::off)) bind.mode = bind_mode_enum::off;
-		if (ImGui::Selectable("Hold", bind.mode == bind_mode_enum::hold)) bind.mode = bind_mode_enum::hold;
-		if (ImGui::Selectable("Toggle", bind.mode == bind_mode_enum::toggle)) bind.mode = bind_mode_enum::toggle;
-		if (ImGui::Selectable("Always On", bind.mode == bind_mode_enum::always)) bind.mode = bind_mode_enum::always;
+		if (ImGui::Selectable("Off", bind.m_mode == bind_mode_enum::off)) bind.m_mode = bind_mode_enum::off;
+		if (ImGui::Selectable("Hold", bind.m_mode == bind_mode_enum::hold)) bind.m_mode = bind_mode_enum::hold;
+		if (ImGui::Selectable("Toggle", bind.m_mode == bind_mode_enum::toggle)) bind.m_mode = bind_mode_enum::toggle;
+		if (ImGui::Selectable("Always On", bind.m_mode == bind_mode_enum::always)) bind.m_mode = bind_mode_enum::always;
 
 		ImGui::EndPopup();
 	}
 }
 
-void bind_s::draw(const char* name)
+void CBind::draw(const char* name)
 {
 	ImGui::PushID(this);
 
@@ -66,7 +66,7 @@ void bind_s::draw(const char* name)
 
 	std::string_view text = "None";
 
-	if (waiting_for_key)
+	if (m_waiting_for_key)
 	{
 		text = "Press Key...";
 
@@ -75,25 +75,25 @@ void bind_s::draw(const char* name)
 			if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(i)))
 			{
 				if (i == ImGuiKey_Escape)
-					key = ImGuiKey_None;
+					m_key = ImGuiKey_None;
 				else
-					key = static_cast<ImGuiKey>(i);
+					m_key = static_cast<ImGuiKey>(i);
 
-				waiting_for_key = false;
+				m_waiting_for_key = false;
 				break;
 			}
 		}
 
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsItemHovered())
-			waiting_for_key = false;
+			m_waiting_for_key = false;
 	}
-	else if (key != ImGuiKey_None)
+	else if (m_key != ImGuiKey_None)
 	{
-		text = ImGui::GetKeyName(key);
+		text = ImGui::GetKeyName(m_key);
 	}
 
 	if (ImGui::Button(text.data()))
-		waiting_for_key = true;
+		m_waiting_for_key = true;
 
 	ImGui::SameLine();
 
@@ -101,19 +101,19 @@ void bind_s::draw(const char* name)
 		ImGui::OpenPopup("BindModePopup");
 
 	constexpr const char* mode_strs[] = { "Off", "Hold", "Toggle", "Always" };
-	ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "(%s)", mode_strs[static_cast<int>(mode)]);
+	ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "(%s)", mode_strs[static_cast<int>(m_mode)]);
 
 	ImGui::PopID();
 }
 
-void bind_s::save(CSimpleIniA& ini, const char* section)
+void CBind::save(CSimpleIniA& ini, const char* section)
 {
-	ini.SetLongValue(section, "key_scancode", key);
-	ini.SetLongValue(section, "key_mode", static_cast<int>(mode));
+	ini.SetLongValue(section, "key_scancode", m_key);
+	ini.SetLongValue(section, "key_mode", static_cast<int>(m_mode));
 }
 
-void bind_s::load(CSimpleIniA& ini, const char* section)
+void CBind::load(CSimpleIniA& ini, const char* section)
 {
-	key = static_cast<ImGuiKey>(ini.GetLongValue(section, "key_scancode", ImGuiKey_None));
-	mode = static_cast<bind_mode_enum>(ini.GetLongValue(section, "key_mode", static_cast<int>(bind_mode_enum::off)));
+	m_key = static_cast<ImGuiKey>(ini.GetLongValue(section, "key_scancode", ImGuiKey_None));
+	m_mode = static_cast<bind_mode_enum>(ini.GetLongValue(section, "key_mode", static_cast<int>(bind_mode_enum::off)));
 }

@@ -17,14 +17,15 @@ enum class bind_mode_enum : uint8_t
 	always
 };
 
-struct bind_s
+class CBind
 {
-	bool active = false;
-	bind_mode_enum mode = bind_mode_enum::off;
-	ImGuiKey key = ImGuiKey_None;
+public:
+	bool m_active = false;
+	bind_mode_enum m_mode = bind_mode_enum::off;
+	ImGuiKey m_key = ImGuiKey_None;
 
-	bool toggle_state = false;
-	bool waiting_for_key = false;
+	bool m_toggle_state = false;
+	bool m_waiting_for_key = false;
 
 	void update();
 	void draw(const char* name);

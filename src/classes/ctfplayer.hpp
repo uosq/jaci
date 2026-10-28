@@ -100,6 +100,9 @@ public:
 	[[nodiscard]] bool in_cond(int cond);
 	[[nodiscard]] bool is_taunting();
 	[[nodiscard]] bool is_ghost();
+
+	CWeapon* GetWeapon();
+	const char* GetClassName();
 };
 
 enum ETFCond

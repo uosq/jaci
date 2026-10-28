@@ -2,41 +2,36 @@
 // Created by tevin on 29/06/2026.
 //
 
+#include <SDL2/SDL_video.h>
 #include <dlfcn.h>
 #include <functional>
-#include <unordered_map>
 
 #include "../binds/bind_manager.hpp"
 #include "../../../thirdparty/imgui/imgui.h"
 
-#include "../../abstract/igui.hpp"
-
 #include "../../interfaces/interfaces.hpp"
 #include "../../logging/log.hpp"
 
-#include "../../features/feature_base.hpp"
-#include "../../features/feature_manager.hpp"
-
 #include "gui_utils.hpp"
 
-IGui* create_vulkan_renderer();
-IGui* create_opengl_renderer();
+#include "../../features/aimbot/aimbot.hpp"
+#include "../../features/esp/esp.hpp"
+#include "../../features/backtrack/backtrack.hpp"
+#include "../../features/misc/misc.hpp"
+
+#include "gui.hpp"
 
 static bool is_open = false;
+static bool is_initialized = false;
 
-static bool has_vulkan()
+bool CGui::HasVulkan()
 {
 	// can't change renderer mid-game sooo
 	static bool has = dlopen("libdxvk_d3d9.so", RTLD_NOLOAD | RTLD_NOW);
 	return has;
 }
 
-IGui* f_gui()
-{
-	return has_vulkan() ? create_vulkan_renderer() : create_opengl_renderer();
-}
-
-static void toggle_menu_visibility()
+void CGui::ToggleGui()
 {
 	if (ImGui::IsKeyPressed(ImGuiKey_Insert, false) || ImGui::IsKeyPressed(ImGuiKey_F11, false))
 	{
@@ -51,68 +46,26 @@ static void toggle_menu_visibility()
 	}
 }
 
-static const char* category_to_string(category cat)
-{
-	switch(cat)
-	{
-		case category::aimbot: return "Aimbot";
-		case category::visuals: return "Visuals";
-
-		// yes let it fall through
-		case category::misc:
-		default: return "Misc";
-	}
-}
-
-static void render_category_tab(category cat)
-{
-	const auto& all_features = f_feature_manager::get().get_features();
-
-	// never let me cook again
-	std::unordered_map<std::string, std::vector<std::shared_ptr<i_feature>>> sections;
-
-	for (const auto& feature : all_features)
-		if (feature->get_category() == cat)
-			sections[feature->get_section()].push_back(feature);
-
-	for (const auto& [section_name, features] : sections)
-	{
-		ImGui::BeginChild(section_name.c_str());
-
-		if (section_name != "None")
-			ImGui::SeparatorText(section_name.c_str());
-
-		for (const auto& feature : features)
-		{
-			gui::checkbox(feature->get_name(), &feature->enabled);
-
-			if (!feature->enabled)
-				continue;
-
-			feature->on_imgui();
-		}
-
-		ImGui::EndChild();
-		ImGui::SameLine(); // makes the other sections side by side (is this the right word?)
-	}
-}
-
 static void draw_main_window()
 {
 	gui::window("lololol", []()
 	{
-		// why can't we just loop over the category enum? this is dumb
-		constexpr category categories[] = {category::aimbot, category::misc, category::visuals};
-
-		gui::tabbar("tabs", [categories]()
+		gui::tabbar("tabs", []()
 		{
-			for (category cat : categories)
+			gui::tab("Main", []()
 			{
-				gui::tab(category_to_string(cat), [cat]()
-				{
-					render_category_tab(cat);
-				});
-			}
+				ImGui::PushID("Aimbot");
+				gui::separatortext("Aimbot"); CAimbot::Gui();
+				ImGui::PopID();
+
+				ImGui::PushID("Backtrack");
+				gui::separatortext("Backtrack"); CBacktrack::Gui();
+				ImGui::PopID();
+
+				ImGui::PushID("Misc");
+				gui::separatortext("Misc"); CMisc::Gui();
+				ImGui::PopID();
+			});
 		});
 	});
 
@@ -140,23 +93,58 @@ static void draw_main_window()
 	});
 }
 
-void draw_gui()
+void CGui::DrawGui()
 {
-	toggle_menu_visibility();
+	CGui::ToggleGui();
 
-	bind_manager::update_binds();
+	CBindManager::UpdateBinds();
 
-	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
-
-	if (drawlist)
-		f_feature_manager::get().dispatch_imgui_background(drawlist);
+	if(ImDrawList* drawlist = ImGui::GetBackgroundDrawList(); drawlist)
+	{
+		drawlist->AddText(ImVec2{10, 10}, IM_COL32(255, 255, 255, 255), "Jaci");
+		CEsp::GuiBackground(drawlist);
+	}
 
 	if (is_open) draw_main_window();
 
 	//backtrack::debug_draw_records();
 }
 
-bool is_gui_open()
+bool CGui::IsOpen()
 {
 	return is_open;
+}
+
+bool CGui::IsInitialized()
+{
+	return is_initialized;
+}
+
+void CGui::SetInitialized(bool value)
+{
+	is_initialized = value;
+}
+
+void CGui::Initialize()
+{
+	if (HasVulkan())
+		InitDXVK();
+	else
+		InitOpenGL();
+}
+
+void CGui::Render()
+{
+	if (HasVulkan())
+		RenderDXVK();
+	else
+		RenderOpenGL();
+}
+
+void CGui::Reset()
+{
+	if(HasVulkan())
+		ResetDXVK();
+	else
+		ResetOpenGL();
 }

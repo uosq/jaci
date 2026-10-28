@@ -5,6 +5,7 @@
 #include "cbaseentity.hpp"
 
 #include "../../thirdparty/libsigscan/libsigscan.h"
+#include "../interfaces/interfaces.hpp"
 
 void CBaseEntity::calc_abs_velocity()
 {
@@ -74,4 +75,9 @@ void CBaseEntity::set_abs_angles(const Vec3& angles)
 	using SetAbsAnglesFn = void(*)(void* self, const Vec3& absAngle);
 	static SetAbsAnglesFn original = reinterpret_cast<SetAbsAnglesFn>(sigscan_module("client.so", "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 F4 53 48 89 FB 48 83 EC 68 E8"));
 	original(this, angles);
+}
+
+CBaseEntity* CBaseEntity::GetEntity(int entindex)
+{
+	return reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(entindex));
 }

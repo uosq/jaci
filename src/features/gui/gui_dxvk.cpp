@@ -2,7 +2,7 @@
 // Created by tevin on 29/06/2026.
 //
 
-#include "../../abstract/igui.hpp"
+#include "gui.hpp"
 
 #include "../../../thirdparty/imgui/imgui.h"
 #include "../../../thirdparty/imgui/imgui_impl_dx9.h"
@@ -12,20 +12,9 @@
 extern SDL_Window* sdl_window;
 extern LPDIRECT3DDEVICE9 d3d_device;
 
-class CGuiVulkan final : public IGui
+void CGui::InitDXVK()
 {
-public:
-	void init() override;
-	void render() override;
-	void reset() override;
-
-private:
-	bool initialized = false;
-};
-
-void CGuiVulkan::init()
-{
-	if (initialized || !sdl_window || !d3d_device)
+	if (CGui::IsInitialized() || !sdl_window || !d3d_device)
 		return;
 
 	if (!ImGui::GetCurrentContext())
@@ -40,39 +29,30 @@ void CGuiVulkan::init()
 	ImGui_ImplSDL2_InitForVulkan(sdl_window);
 	ImGui_ImplDX9_Init(d3d_device);
 
-	initialized = true;
+	CGui::SetInitialized(true);
 }
 
-void CGuiVulkan::render()
+void CGui::RenderDXVK()
 {
-	if (!initialized)
+	if (!CGui::IsInitialized())
 		return;
 
 	ImGui_ImplDX9_NewFrame(); // shit why does this crash?? // im fucking dumb i forgot to initialize the gui
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	draw_gui();
+	CGui::DrawGui();
 
 	ImGui::EndFrame();
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 }
 
-void CGuiVulkan::reset()
+void CGui::ResetDXVK()
 {
-	if (!initialized)
-		return;
-
 	ImGui_ImplDX9_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 
 	d3d_device = nullptr;
-	initialized = false;
-}
-
-IGui* create_vulkan_renderer()
-{
-	static CGuiVulkan gui;
-	return &gui;
+	CGui::SetInitialized(false);
 }

@@ -42,6 +42,10 @@ CTFWeaponInfo* CWeapon::get_weapon_info()
 	m_flPunchAngle is 0x734
 	*/
 
+	int x = 1;
+	int* y = &x;
+	int i = x ** y;
+
 	return *reinterpret_cast<CTFWeaponInfo**>(reinterpret_cast<std::uintptr_t>(this) + 0xf80);
 }
 

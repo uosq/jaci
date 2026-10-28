@@ -9,7 +9,6 @@
 
 #include "../../../thirdparty/simpleini/SimpleIni.h"
 
-#include "../../features/feature_manager.hpp"
 #include "../../logging/log.hpp"
 
 static bool can_work = false;
@@ -56,16 +55,7 @@ bool config_manager::save_to_file(const char* full_path)
 	CSimpleIniA ini;
 	ini.SetUnicode(true);
 
-	auto& features = f_feature_manager::get().get_features();
 
-	for (const auto& feature : features)
-	{
-		if (!feature->on_save(ini))
-		{
-			make_log(std::format("Couldn't save feature '{}'", feature->get_name()));
-			return false;
-		}
-	}
 
 	return ini.SaveFile(full_path) == SI_OK;
 }
@@ -80,6 +70,8 @@ bool config_manager::load_from_file(const char *full_path)
 		make_log(std::format("Can't load from file '{}'", full_path));
 		return false;
 	}
+
+	return true;
 }
 
 void config_manager::init()

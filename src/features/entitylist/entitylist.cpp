@@ -14,83 +14,36 @@
 #include <span>
 #include <array>
 
-static entity_s localplayer_entity {.index = -1};
-
+static CPlayer* localplayer_entity = nullptr;
 static CPlayerResource* player_resource = nullptr;
-
-static std::array<entity_s, MAX_PLAYERS> players;
+static std::array<CPlayer*, MAX_PLAYERS> players;
 static std::size_t player_count = 0;
 
-static_assert(sizeof(players) == (sizeof(entity_s) * MAX_PLAYERS));
+static_assert(sizeof(players) == (sizeof(CBaseEntity*) * MAX_PLAYERS));
 
-static void add_to_player_list(CBaseEntity* base_entity)
+static void add_to_player_list(CPlayer* base_entity)
 {
-	auto* player = reinterpret_cast<CPlayer*>(base_entity);
-
-	const int ent_index = base_entity->entindex();
-	const int flags = player->m_fFlags();
-	const uint8_t water_level = player->m_nWaterLevel();
-
-	players.at(player_count++) =
-	{
-		.index = ent_index,
-		.health = static_cast<uint16_t>(player->m_iHealth()),
-
-		.pos = player->GetAbsOrigin(),
-		.velocity = player->estimate_abs_velocity(),
-
-		.player_flags = {
-			.on_ground = (flags & FL_ONGROUND) != 0,
-			.on_water = (flags & FL_INWATER) != 0,
-			.crouching = (flags & FL_DUCKING) != 0,
-			.water_level = static_cast<water_level_enum>(water_level)
-		},
-
-		.player_class = static_cast<uint8_t>(player->m_iClass()),
-		.type = entity_type_enum::Player,
-
-		.team = static_cast<uint8_t>(base_entity->m_iTeamNum()),
-
-		.is_alive = player->is_alive(),
-
-		.sim_time = player->m_flSimulationTime()
-	};
-}
-
-static void populate_player_max_and_buffed_health()
-{
-	if (!player_resource)
-	{
-		make_log("CTFPlayerResource is null");
-		return;
-	}
-
-	for (size_t i = 0; i < player_count; i++)
-	{
-		players[i].max_health = player_resource->m_iMaxHealth(players[i].index);
-		players[i].max_buffed_health = player_resource->m_iMaxBuffedHealth(players[i].index);
-	}
+	players.at(player_count++) = base_entity;
 }
 
 static void find_localplayer_entity()
 {
 	const int localplayer_index = g_engineclient->GetLocalPlayer();
-
-	localplayer_entity.index = -1;
+	localplayer_entity = nullptr;
 
 	for (size_t i = 0; i < player_count; ++i)
 	{
-		if (players[i].index == localplayer_index)
+		if (players[i]->entindex() == localplayer_index)
 		{
-			localplayer_entity = players[i];
+			localplayer_entity = reinterpret_cast<CPlayer*>(players.at(i));
 			break;
 		}
 	}
 }
 
-void f_entitylist::update()
+void CEntityList::Update()
 {
-	reset();
+	Reset();
 
 	const int max_game_entities = g_cliententitylist->GetMaxEntities();
 
@@ -104,7 +57,7 @@ void f_entitylist::update()
 		switch (base_entity->GetClassID())
 		{
 			case ETFClassID::CTFPlayer:
-				add_to_player_list(base_entity);
+				add_to_player_list(reinterpret_cast<CPlayer*>(base_entity));
 				break;
 
 			case ETFClassID::CTFPlayerResource:
@@ -116,26 +69,24 @@ void f_entitylist::update()
 		}
 	}
 
-	populate_player_max_and_buffed_health();
 	find_localplayer_entity();
 }
 
-std::span<const entity_s> f_entitylist::get_players()
+std::span<CPlayer*> CEntityList::GetPlayers()
 {
 	return {players.data(), player_count};
 }
 
-const entity_s& f_entitylist::get_local()
+CPlayer* CEntityList::GetLocalPlayer()
 {
 	return localplayer_entity;
 }
 
-void f_entitylist::reset()
+void CEntityList::Reset()
 {
 	player_resource = nullptr;
-
-	localplayer_entity.index = -1;
+	localplayer_entity = nullptr;
 
 	player_count = 0;
-	players.fill({});
+	players.fill(nullptr);
 }

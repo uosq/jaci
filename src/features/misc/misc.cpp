@@ -9,36 +9,27 @@
 #include "../../classes/defs.hpp"
 #include "../../classes/convar.hpp"
 #include "../../classes/host.hpp"
+#include "../../classes/ctfplayer.hpp"
 
 #include "../../interfaces/interfaces.hpp"
 
 #include "../../logging/log.hpp"
 
-#include "../feature_register.hpp"
+#include "../gui/gui_utils.hpp"
 
-class f_antiafk : public i_feature
-{
-public:
-	F_NAME_CATEGORY(Anti Afk, category::misc)
-	F_CREATEMOVE()
-	F_RESET()
-};
+bool CMisc::antiafk = false;
+bool CMisc::bhop = false;
+bool CMisc::sv_pure_bypass = false;
 
-class f_bhop : public i_feature
-{
-public:
-	F_NAME_CATEGORY(Bunny Hop, category::misc)
-	F_CREATEMOVE()
-	F_RESET()
-};
+static bool bhop_used_air_jump = false;
+static bool bhop_jump_released = false;
 
-static bool used_air_jump = false;
-static bool jump_released = false;
 static int afk_ticks = 0;
+static bool afk_enabled = false;
 
-void f_antiafk::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+void Antiafk(CPlayer* localplayer, CUserCmd* cmd)
 {
-	if (local.index == -1 || !cmd || !enabled)
+	if (!localplayer || !cmd || !CMisc::antiafk)
 		return;
 
 	static ConVar* mp_idlemaxtime = g_enginecvar->FindVar("mp_idlemaxtime");
@@ -66,26 +57,26 @@ void f_antiafk::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd*
 	}
 }
 
-void f_antiafk::on_reset()
+void ResetAntiafk()
 {
 	afk_ticks = 0;
 }
 
-void f_bhop::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cmd)
+void BHop(CPlayer* localplayer, CUserCmd* cmd)
 {
-	if (!enabled)
+	if (!CMisc::bhop || !localplayer || !localplayer->is_alive())
 		return;
 
 	const bool wants_jump = (cmd->buttons & IN_JUMP) != 0;
-	const bool is_on_ground = local.player_flags.on_ground;
-	const bool is_scout = local.player_class == TF_CLASS_SCOUT;
+	const bool is_on_ground = !!(localplayer->m_fFlags() & FL_ONGROUND);
+	const bool is_scout = localplayer->m_iClass() == TF_CLASS_SCOUT;
 
 	// everyone jumps the same way, right?
 	// maybe check if it's the same thing for Saxton Hale?
 	if (is_on_ground)
 	{
-		used_air_jump = false;
-		jump_released = false;
+		bhop_used_air_jump = false;
+		bhop_jump_released = false;
 
 		if (wants_jump)
 			cmd->buttons |= IN_JUMP;
@@ -93,16 +84,16 @@ void f_bhop::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cm
 	else // in air
 	{
 		if (!wants_jump)
-			jump_released = true;
+			bhop_jump_released = true;
 
 		// we are a scout
 		// we want to jump
 		// still didn't double jump
 		// we already released the jump button before (if (!wants_jump))
-		if (is_scout && wants_jump && !used_air_jump && jump_released)
+		if (is_scout && wants_jump && !bhop_used_air_jump && bhop_jump_released)
 		{
 			cmd->buttons |= IN_JUMP;
-			used_air_jump = true;
+			bhop_used_air_jump = true;
 		}
 		else
 		{
@@ -111,12 +102,27 @@ void f_bhop::on_create_move(const entity_s& local, CWeapon* weapon, CUserCmd* cm
 	}
 }
 
-void f_bhop::on_reset()
+void ResetBhop()
 {
-	used_air_jump = false;
-	jump_released = false;
+	bhop_used_air_jump = false;
+	bhop_jump_released = false;
 }
 
-REGISTER_FEATURE(f_antiafk)
-REGISTER_FEATURE(f_bhop)
-REGISTER_FEATURE(f_sv_pure_bypass)
+void CMisc::CreateMove(CPlayer* localplayer, CUserCmd* cmd)
+{
+	BHop(localplayer, cmd);
+	Antiafk(localplayer, cmd);
+}
+
+void CMisc::Reset()
+{
+	ResetBhop();
+	ResetAntiafk();
+}
+
+void CMisc::Gui()
+{
+	gui::checkbox("Anti AFK", &CMisc::antiafk, "Enable Anti AFK");
+	gui::checkbox("Bhop", &CMisc::bhop, "Enable Bunny Hop");
+	gui::checkbox("sv_pure Bypass", &CMisc::sv_pure_bypass, "Makes custom mods run in (Valve TM) Casual servers");
+}

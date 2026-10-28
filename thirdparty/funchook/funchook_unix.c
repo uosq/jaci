@@ -40,6 +40,7 @@
 #ifdef __linux
 #include <elf.h>
 #include <link.h>
+#include <linux/limits.h>
 #endif
 #ifdef __APPLE__
 #include <stdlib.h>
@@ -60,7 +61,7 @@ const char *funchook_strerror(int errnum, char *buf, size_t buflen)
     return strerror_r(errnum, buf, buflen);
 #else
     /* XSI-compliant version */
-    if (strerror_r(errnum, buf, buflen) != 0) {
+    if (strerror(errnum) != 0) {
         snprintf(buf, buflen, "errno %d", errnum);
     }
     return buf;

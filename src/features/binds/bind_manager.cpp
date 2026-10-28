@@ -6,14 +6,14 @@
 
 #include <unordered_set>
 
-static std::unordered_set<struct bind_s*> binds;
+static std::unordered_set<struct CBind*> binds;
 
-void bind_manager::add_bind(struct bind_s& bind)
+void CBindManager::AddBind(struct CBind& bind)
 {
 	binds.insert(&bind);
 }
 
-void bind_manager::update_binds()
+void CBindManager::UpdateBinds()
 {
 	for (auto& bind : binds)
 		bind->update();
