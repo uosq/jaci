@@ -3,12 +3,14 @@
 //
 
 #include <charconv>
+#include <format>
 #include <vector>
+#include <string>
 
 #include "../classes/convar.hpp"
 
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../interfaces/interfaces.hpp"
+#include "../logging/log.hpp"
 
 #if 0
 typedef enum
@@ -27,6 +29,8 @@ enum
 	NUMBER_INT = 0,
 	NUMBER_FLOAT,
 };
+
+void* original_Cbuf_AddText = nullptr;
 
 static std::vector<std::string> split(std::string text, const std::string& separator)
 {
@@ -64,9 +68,10 @@ static int find_number_type(const std::string& text)
 	return text.find(".") ? NUMBER_FLOAT : NUMBER_INT;
 }
 
-// look for: Cbuf_AddText buffer overflow
-INIT_HOOK_OFFSET(AddText, void, (const char* text), "engine.so", "48 89 4D C0 0F 29 45 B0 C7 45 C8 F2 00 00 00", 0x3C)
+void Cbuf_AddText(const char* text)
 {
+	using OriginalFn = void(*)(const char* text);
+
 	//this doesn't have support for strings, shit
 	if (std::string_view full_text{text}; full_text.starts_with("set_convar "))
 	{
@@ -130,14 +135,5 @@ INIT_HOOK_OFFSET(AddText, void, (const char* text), "engine.so", "48 89 4D C0 0F
 		return;
 	}
 
-	original_AddText(text);
+	((OriginalFn)original_Cbuf_AddText)(text);
 }
-
-#if 0
-INIT_HOOK_OFFSET(AddTextWithMarkers, void, (ECmdExecutionMarker left, const char* text, ECmdExecutionMarker right), "engine.so", "89 95 98 FB FF FF 0F 8F", 0x2B)
-{
-	original_AddTextWithMarkers(left, text, right);
-
-	LOG("Cbuf_AddTextWithMarkers called, text: {}", text);
-}
-#endif

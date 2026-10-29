@@ -9,7 +9,6 @@
 #include "../../classes/ctfplayer.hpp"
 
 #include "../../interfaces/interfaces.hpp"
-#include "../../logging/log.hpp"
 
 #include <span>
 #include <array>
@@ -41,11 +40,11 @@ static void find_localplayer_entity()
 	}
 }
 
-void CEntityList::Update()
+void CEntityList::Before_FrameStageNotify()
 {
 	Reset();
 
-	const int max_game_entities = g_cliententitylist->GetMaxEntities();
+	const int max_game_entities = g_cliententitylist->GetHighestEntityIndex();
 
 	for (int i = 1; i <= max_game_entities; i++)
 	{

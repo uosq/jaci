@@ -15,9 +15,12 @@
                     00 00 00
 */
 
+#if 0
 #include "../features/hook_manager/hookmanager.hpp"
 
 INIT_HOOK(LevelShutdown, void, (void* rdi), "client.so", "80 3D ? ? ? ? 00 75 ? C3")
 {
 	original_LevelShutdown(rdi);
 }
+
+#endif

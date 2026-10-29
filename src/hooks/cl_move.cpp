@@ -17,7 +17,6 @@
 #include "../utils/utils.hpp"
 
 #include "../features/entitylist/entitylist.hpp"
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/backtrack/backtrack.hpp"
 #include "../features/misc/misc.hpp"
@@ -133,14 +132,17 @@ static bool Host_ShouldRun()
 }
 */
 
-INIT_HOOK(CL_Move, void, (float accumulated_extra_samples, bool bFinalTick), "engine.so", "55 48 89 E5 41 57 41 56 41 55 41 54 53 48 83 EC 78 83 3D ? ? ? ? 01")
+void* original_CL_Move = nullptr;
+
+void CL_Move(float accumulated_extra_samples, bool bFinalTick)
 {
 	static void* host_shouldrun_ptr = sigscan_module("engine.so", "48 8B 15 ? ? ? ? B8 01 00 00 00 8B 72 58");
 
 	if (host_shouldrun_ptr == nullptr) [[unlikely]]
 	{
+		using OriginalFn = void(*)(float accumulated_extra_samples, bool bFinalTick);
 		make_log("Host_ShouldRun is null");
-		original_CL_Move(accumulated_extra_samples, bFinalTick);
+		((OriginalFn)original_CL_Move)(accumulated_extra_samples, bFinalTick);
 		return;
 	}
 

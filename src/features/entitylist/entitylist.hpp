@@ -21,7 +21,7 @@ constexpr int MAX_BUILDINGS_TOTAL = MAX_PLAYERS * MAX_BUILDINGS_PER_PLAYER;
 class CEntityList
 {
 public:
-	static void Update();
+	static void Before_FrameStageNotify();
 
 	static std::span<CPlayer*> GetPlayers();
 	static CPlayer* GetLocalPlayer();

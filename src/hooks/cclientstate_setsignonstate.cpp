@@ -5,15 +5,19 @@
 #include "../utils/utils.hpp"
 #include "../classes/protocol.hpp"
 
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../features/entitylist/entitylist.hpp"
 #include "../features/backtrack/backtrack.hpp"
 #include "../features/esp/esp.hpp"
 #include "../features/misc/misc.hpp"
 
-INIT_HOOK(SetSignonState, void, (void* self, int state, int count), "engine.so", "55 48 89 E5 41 57 41 56 41 89 D6 41 55 41 54 49 89 FC 53 89 F3")
+#include "../logging/log.hpp"
+
+void* original_CClientState_SetSignonState = nullptr;
+
+void CClientState_SetSignonState(void* rdx, int state, int count)
 {
-	original_SetSignonState(self, state, count);
+	using OriginalFn = void(*)(void* rdx, int state, int count);
+	((OriginalFn)original_CClientState_SetSignonState)(rdx, state, count);
 
 	if (state == SIGNONSTATE_FULL)
 	{

@@ -11,6 +11,11 @@
 
 #include "../../logging/log.hpp"
 
+#include "../../features/aimbot/aimbot.hpp"
+#include "../../features/backtrack/backtrack.hpp"
+#include "../../features/esp/esp.hpp"
+#include "../../features/misc/misc.hpp"
+
 static bool can_work = false;
 
 static bool does_file_exist(const char* full_path)
@@ -47,7 +52,7 @@ static bool create_jaci_directory()
 	return true;
 }
 
-bool config_manager::save_to_file(const char* full_path)
+bool CConfigManager::SaveToFile(const char* full_path)
 {
 	if (!can_work)
 		return false;
@@ -55,12 +60,15 @@ bool config_manager::save_to_file(const char* full_path)
 	CSimpleIniA ini;
 	ini.SetUnicode(true);
 
-
+	CAimbot::Save(ini);
+	CBacktrack::Save(ini);
+	CEsp::Save(ini);
+	CMisc::Save(ini);
 
 	return ini.SaveFile(full_path) == SI_OK;
 }
 
-bool config_manager::load_from_file(const char *full_path)
+bool CConfigManager::LoadFromFile(const char *full_path)
 {
 	if (!can_work)
 		return false;
@@ -71,10 +79,24 @@ bool config_manager::load_from_file(const char *full_path)
 		return false;
 	}
 
+	CSimpleIniA ini;
+	ini.SetUnicode(true);
+
+	if (ini.LoadFile(full_path) != SI_OK)
+	{
+		make_log(std::format("Can't load file {} from disk!", full_path));
+		return false;
+	}
+
+	CAimbot::Load(ini);
+	CBacktrack::Load(ini);
+	CEsp::Load(ini);
+	CMisc::Load(ini);
+
 	return true;
 }
 
-void config_manager::init()
+void CConfigManager::Initialize()
 {
 	const char* xdg_config = get_xdg_config();
 

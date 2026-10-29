@@ -115,9 +115,7 @@ static CPlayer* find_best_player(CPlayer* localplayer, const weapon_hit_point_en
 
 static Vec3 predict_player(CPlayer* target, const Vec3& start_pos, const ProjectileInfo_t& projectile_info, const float required_time_seconds, const weapon_hit_point_enum hit_point)
 {
-	Vec3 predicted_pos = start_pos;
-
-	simulate_player(predicted_pos, target, required_time_seconds);
+	Vec3 predicted_pos = CPrediction::SimulatePlayer(start_pos, target, required_time_seconds);
 	predicted_pos.z += 2.0f;
 
 	if (hit_point == weapon_hit_point_enum::head)
@@ -135,9 +133,6 @@ static Vec3 predict_player(CPlayer* target, const Vec3& start_pos, const Project
 
 void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
 {
-	if (!localplayer)
-		return;
-
 	ProjectileInfo_t projectile_info;
 	if (!weapon->get_projectile_info(projectile_info))
 		return;
@@ -154,8 +149,7 @@ void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd
 	const int localindex = localplayer->entindex();
 	const int localteam = localplayer->m_iTeamNum();
 
-	CPlayer* best_player = find_best_player(localplayer, hit_point, localteam, can_target_teammates, eye_pos, viewangles, closest_fov);
-	CBaseEntity* target = best_player; // hack
+	CBaseEntity* target = (CBaseEntity*)find_best_player(localplayer, hit_point, localteam, can_target_teammates, eye_pos, viewangles, closest_fov);
 
 	if (!target)
 		return;
@@ -208,7 +202,7 @@ void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd
 			sim_info.mins = Vec3{ -projectile_info.hull.x, -projectile_info.hull.y, -projectile_info.hull.z };
 		}
 
-		if (!simulate_projectile(sim_info))
+		if (!CPrediction::SimulateProjectile(sim_info))
 			return;
 	}
 

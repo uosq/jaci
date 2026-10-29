@@ -5,6 +5,8 @@
 #ifndef JACI_BACKTRACK_HPP
 #define JACI_BACKTRACK_HPP
 
+#include "../../../thirdparty/simpleini/SimpleIni.h"
+
 #include "../../classes/matrix3x4.hpp"
 #include "../../classes/vector3.hpp"
 
@@ -32,6 +34,9 @@ public:
 	static int max_ticks;
 
 	static const char* GetName() { return "Backtrack"; };
+
+	static void Save(CSimpleIniA& ini);
+	static void Load(CSimpleIniA& ini);
 
 	// events
 	static void CreateMove(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd);

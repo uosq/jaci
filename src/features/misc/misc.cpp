@@ -126,3 +126,17 @@ void CMisc::Gui()
 	gui::checkbox("Bhop", &CMisc::bhop, "Enable Bunny Hop");
 	gui::checkbox("sv_pure Bypass", &CMisc::sv_pure_bypass, "Makes custom mods run in (Valve TM) Casual servers");
 }
+
+void CMisc::Save(CSimpleIniA& ini)
+{
+	ini.SetBoolValue("Misc", "Antiafk", CMisc::antiafk);
+	ini.SetBoolValue("Misc", "Bhop", CMisc::bhop);
+	ini.SetBoolValue("Misc", "sv_pure", CMisc::sv_pure_bypass);
+}
+
+void CMisc::Load(CSimpleIniA& ini)
+{
+	CMisc::antiafk = ini.GetBoolValue("Misc", "Antiafk", false);
+	CMisc::bhop = ini.GetBoolValue("Misc", "Bhop", false);
+	CMisc::sv_pure_bypass = ini.GetBoolValue("Misc", "sv_pure", false);
+}

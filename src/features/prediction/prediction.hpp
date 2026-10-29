@@ -22,10 +22,14 @@ struct projectile_sim_info
 	Vec3 mins, maxs;
 };
 
-void simulate_player(Vec3& out, CPlayer* player, float seconds);
+class CPrediction
+{
+public:
+	static Vec3 SimulatePlayer(const Vec3& start_pos, CPlayer* player, float seconds);
 
-void init_projectile();
-bool simulate_projectile(projectile_sim_info& info);
-void shutdown_projectile();
+	static void InitProjectileSim();
+	static bool SimulateProjectile(projectile_sim_info& info);
+	static void ShutdownProjectileSim();
+};
 
 #endif //GUARACI_PREDICTION_HPP

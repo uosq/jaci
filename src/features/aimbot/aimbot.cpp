@@ -73,13 +73,11 @@ void CAimbot::Gui()
 	gui::slider("Fov", &CAimbot::fov, 0, 180, "Max fov");
 }
 
-bool CAimbot::Save(CSimpleIniA& ini)
+void CAimbot::Save(CSimpleIniA& ini)
 {
 	ini.SetBoolValue(GetName(), "enabled", CAimbot::enabled);
 	ini.SetLongValue(GetName(), "fov", fov);
 	key.save(ini, GetName());
-
-	return true;
 }
 
 void CAimbot::Load(CSimpleIniA& ini)

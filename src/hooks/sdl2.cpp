@@ -8,23 +8,27 @@
 #include "../../thirdparty/imgui/imgui_impl_sdl2.h"
 
 #include "../features/gui/gui.hpp"
-#include "../features/hook_manager/hookmanager.hpp"
 
 SDL_Window* sdl_window = nullptr;
 
-INIT_DLSYM_HOOK(SwapWindow, void, (SDL_Window* window), "libSDL2-2.0.so.0", "SDL_GL_SwapWindow")
+void* original_SDL_GL_SwapWindow = nullptr;
+void* original_SDL_PollEvent = nullptr;
+
+void SDL_SwapWindow(SDL_Window* window)
 {
 	sdl_window = window;
 
 	CGui::Initialize();
 	CGui::Render();
 
-	original_SwapWindow(window);
+	using OriginalFn = void(*)(SDL_Window*);
+	((OriginalFn)original_SDL_GL_SwapWindow)(window);
 }
 
-INIT_DLSYM_HOOK(PollEvent, int, (SDL_Event* event), "libSDL2-2.0.so.0", "SDL_PollEvent")
+int hk_SDL_PollEvent(SDL_Event* event)
 {
-	const int ret = original_PollEvent(event);
+	using OriginalFn = int(*)(SDL_Event*);
+	const int ret = ((OriginalFn)original_SDL_PollEvent)(event);
 
 	if (ret > 0 && event != nullptr)
 	{

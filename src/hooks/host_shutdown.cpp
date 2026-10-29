@@ -4,14 +4,15 @@
 
 #include "../logging/log.hpp"
 
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../features/prediction/prediction.hpp"
 
-INIT_HOOK(Host_Shutdown, void, (), "engine.so", "80 3D ? ? ? ? 00 0F 85 ? ? ? ? 55 31 F6")
+void* original_Host_Shutdown = nullptr;
+
+void Host_Shutdown()
 {
 	make_log("TF2 is shutting down");
-	
-	shutdown_projectile();
+	CPrediction::ShutdownProjectileSim();
 
-	original_Host_Shutdown();
+	using OriginalFn = void(*)();
+	((OriginalFn)original_Host_Shutdown)();
 }

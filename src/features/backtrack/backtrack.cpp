@@ -320,3 +320,15 @@ void CBacktrack::Before_FrameStageNotify()
 {
 	Store();
 }
+
+void CBacktrack::Save(CSimpleIniA& ini)
+{
+	ini.SetBoolValue(GetName(), "enabled", CBacktrack::enabled);
+	ini.SetLongValue(GetName(), "maxticks", CBacktrack::max_ticks);
+}
+
+void CBacktrack::Load(CSimpleIniA& ini)
+{
+	CBacktrack::enabled = ini.GetBoolValue(GetName(), "enabled", false);
+	CBacktrack::max_ticks = ini.GetLongValue(GetName(), "maxticks", false);
+}

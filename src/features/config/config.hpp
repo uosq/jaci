@@ -5,12 +5,13 @@
 #ifndef JACI_CONFIG_HPP
 #define JACI_CONFIG_HPP
 
-struct config_manager
+class CConfigManager
 {
-	static void init();
+public:
+	static void Initialize();
 
-	static bool save_to_file(const char* full_path);
-	static bool load_from_file(const char* full_path);
+	static bool SaveToFile(const char* full_path);
+	static bool LoadFromFile(const char* full_path);
 };
 
 #endif //JACI_CONFIG_HPP

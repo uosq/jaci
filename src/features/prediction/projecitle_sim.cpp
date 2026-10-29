@@ -27,7 +27,7 @@ static objectparams_t g_PhysDefaultObjectParams =
 		true,// enable collisions?
 };
 
-void init_projectile()
+void CPrediction::InitProjectileSim()
 {
 	phys_env = g_vphysics->CreateEnvironment();
 	phys_collide = g_vphysics_collide->BBoxToCollide(Vec3{-2, -2, -2}, Vec3{2, 2, 2});
@@ -52,7 +52,7 @@ static bool setup_projectile(const Vec3& initial_pos, const Vec3& initial_angle)
 	return true;
 }
 
-bool simulate_projectile(projectile_sim_info& info)
+bool CPrediction::SimulateProjectile(projectile_sim_info &info)
 {
 	if (!phys_env || !phys_collide || !phys_obj)
 		return false;
@@ -93,7 +93,7 @@ bool simulate_projectile(projectile_sim_info& info)
 	return ret;
 }
 
-void shutdown_projectile()
+void CPrediction::ShutdownProjectileSim()
 {
 	phys_env->DestroyObject(phys_obj);
 	g_vphysics_collide->DestroyCollide(phys_collide);

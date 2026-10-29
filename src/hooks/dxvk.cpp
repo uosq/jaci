@@ -5,21 +5,20 @@
 #include "../../thirdparty/d3d9/d3d9.h"
 #include "../../thirdparty/d3d9/windows_base.h"
 
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../features/gui/gui.hpp"
 
 LPDIRECT3DDEVICE9 d3d_device = nullptr;
+
+void* original_D3D9SwapChainEx_Present = nullptr;
+void* original_D3D9DeviceEx_Reset = nullptr;
 
 // 2 vfunctions after D3D9DeviceEx::Reset
 // you find vfunction18 (Present) which calls PresentEx
 // but PresentEx and Present are generic as shit so can't reliably sig them
 // so use the D3D9SwapChainEx::Present instead
 // https://github.com/doitsujin/dxvk/blob/64542839fedb9684a5636660d1d138121ee17eec/src/d3d9/d3d9_device.cpp#L4248
-INIT_HOOK(D3D9SwapChainEx_Present, HRESULT, (IDirect3DSwapChain9Ex* swapchain, const RECT* pSourceRect,
-    const RECT* pDestRect,
-	  HWND hDestWindowOverride,
-    const RGNDATA* pDirtyRegion,
-	  DWORD dwFlags), "libdxvk_d3d9.so", "41 57 41 56 49 89 D6 41 55 41 54 55 48 89 FD")
+HRESULT D3D9SwapChainEx_Present(IDirect3DSwapChain9Ex* swapchain, const RECT* pSourceRect,
+	const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion, DWORD dwFlags)
 {
 	if (!d3d_device)
 	{
@@ -36,13 +35,16 @@ INIT_HOOK(D3D9SwapChainEx_Present, HRESULT, (IDirect3DSwapChain9Ex* swapchain, c
 		CGui::Render();
 	}
 
-	return original_D3D9SwapChainEx_Present(swapchain, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
+	using OriginalFn = HRESULT(*)(IDirect3DSwapChain9Ex* swapchain, const RECT* pSourceRect,
+	const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion, DWORD dwFlags);
+	return ((OriginalFn)original_D3D9SwapChainEx_Present)(swapchain, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
 }
 
 // xref: Device reset failed because device still has alive losable resources: Device not reset. Remaining resources:
-INIT_HOOK(D3D9DeviceEx_Reset, HRESULT, (LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS* pPresentationParamters), "libdxvk_d3d9.so", "41 57 41 56 45 31 F6 41 55 41 54 49 89 F4")
+HRESULT D3D9DeviceEx_Reset(LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS* pPresentationParamters)
 {
-	const auto ret = original_D3D9DeviceEx_Reset(device, pPresentationParamters);
+	using OriginalFn = HRESULT(*)(LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS* pPresentationParamters);
+	const auto ret = ((OriginalFn)original_D3D9DeviceEx_Reset)(device, pPresentationParamters);
 
 	CGui::Reset();
 	d3d_device = device;

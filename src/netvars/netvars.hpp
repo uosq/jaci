@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <unordered_map>
-#include <array>
 
 struct RecvTable;
 class CHLClient;

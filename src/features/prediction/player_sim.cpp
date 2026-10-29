@@ -893,9 +893,13 @@ static void air_move()
 	m_vecVelocity -= m_vecBaseVelocity;
 }
 
-void simulate_player(Vec3& out, CPlayer* player, const float seconds)
+Vec3 CPrediction::SimulatePlayer(const Vec3& start_pos, CPlayer* player, float seconds)
 {
+	Vec3 end_pos = start_pos;
+
 	begin_prediction(player, seconds);
-	simulate(out);
+	simulate(end_pos);
 	end_prediction();
+
+	return end_pos;
 }

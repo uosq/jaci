@@ -1,7 +1,8 @@
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../classes/cusercmd.hpp"
 
-INIT_HOOK(CInput_GetUserCmd, CUserCmd*, (void* input, int sequence_number), "client.so", "55 48 89 E5 41 56 41 89 D6 41 55 49 89 FD 41 54 4C 8D 65 DC")
+void* original_CInput_GetUserCmd = nullptr;
+
+CUserCmd* CInput_GetUserCmd(void* input, int sequence_number)
 {
 	// 0x8 + 0x100
 	const std::uintptr_t data_ptr = *reinterpret_cast<std::uintptr_t*>(reinterpret_cast<std::uintptr_t>(input) + 0x108);

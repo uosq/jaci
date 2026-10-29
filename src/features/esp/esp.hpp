@@ -24,7 +24,7 @@ public:
 
 	static void Reset();
 
-	static bool Save(CSimpleIniA& ini);
+	static void Save(CSimpleIniA& ini);
 	static void Load(CSimpleIniA& ini);
 };
 

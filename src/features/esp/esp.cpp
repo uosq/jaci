@@ -295,7 +295,7 @@ void CEsp::Load(CSimpleIniA& ini)
 	name = static_cast<side_enum>(ini.GetLongValue(GetName(), "name", 0));
 }
 
-bool CEsp::Save(CSimpleIniA& ini)
+void CEsp::Save(CSimpleIniA& ini)
 {
 	save_imvec4("red team color", ini, red_team_color);
 	save_imvec4("blu team color", ini, blu_team_color);
@@ -304,6 +304,4 @@ bool CEsp::Save(CSimpleIniA& ini)
 	ini.SetBoolValue(GetName(), "localplayer", CEsp::localplayer);
 	ini.SetLongValue(GetName(), "name", static_cast<int>(CEsp::name));
 	ini.SetLongValue(GetName(), "font size", CEsp::font_size);
-
-	return true;
 }

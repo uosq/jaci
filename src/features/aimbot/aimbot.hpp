@@ -34,7 +34,7 @@ public:
 	static void CreateMove(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd);
 	static void Gui();
 
-	static bool Save(CSimpleIniA& ini);
+	static void Save(CSimpleIniA& ini);
 	static void Load(CSimpleIniA& ini);
 
 	static void Initialize();

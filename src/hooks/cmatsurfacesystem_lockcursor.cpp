@@ -2,8 +2,9 @@
 // Created by tevin on 29/06/2026.
 //
 
-#include "../features/hook_manager/hookmanager.hpp"
 #include "../features/gui/gui.hpp"
+
+void* original_CMatSystemSurface_LockCursor = nullptr;
 
 /*
 Inside CMatSystemSurface::LockCursor (vtable index 62) it does this:
@@ -13,10 +14,12 @@ void __thiscall CMatSystemSurface::vfunction62(void)
 	return;
 }
 */
-INIT_HOOK(LockCursor, void, (void* rdi, bool state), "vguimatsurface.so", "40 88 3D ? ? ? ? E9")
+void CMatSystemSurface_LockCursor(void* rdi, bool state)
 {
-	if (CGui::IsOpen())
-		return original_LockCursor(rdi, false); // <- UnlockCursor();
+	using OriginalFn = void(*)(void* rdi, bool state);
 
-	original_LockCursor(rdi, state);
+	if (CGui::IsOpen())
+		return ((OriginalFn)(original_CMatSystemSurface_LockCursor))(rdi, false); // <- UnlockCursor();
+
+	((OriginalFn)original_CMatSystemSurface_LockCursor)(rdi, state);
 }
