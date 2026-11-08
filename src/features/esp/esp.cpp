@@ -138,7 +138,7 @@ static bool fill_info(esp_info& in, CBaseEntity* entity)
 	return true;
 }
 
-void CEsp::Before_FrameStageNotify()
+void CEsp::FrameStageNotify()
 {
 	clear_list();
 

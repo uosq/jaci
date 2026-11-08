@@ -7,7 +7,7 @@
 static uint32_t id_counter = 0;
 static std::vector<log_info> logs {};
 
-log_info::log_info(const std::string& text) : id(id_counter++), message(text), time(std::chrono::system_clock::now()) {}
+log_info::log_info(const std::string_view& text) : id(id_counter++), message(text), time(std::chrono::system_clock::now()) {}
 
 std::string log_info::get_formatted_timestamp() const
 {

@@ -27,7 +27,9 @@ namespace gui
 
 	bool button(const char* text, const ImVec2& size = {0, 0}, const char* tooltip = nullptr);
 	bool checkbox(const char* text, bool* value, const char* tooltip = nullptr);
+
 	bool slider(const char* text, int* value, const int min, const int max, const char* tooltip = nullptr);
+	bool slider(const char* text, float* value, const float min, const float max, const char* tooltip = nullptr);
 
 	void section(const char* id, std::function<void()> content);
 

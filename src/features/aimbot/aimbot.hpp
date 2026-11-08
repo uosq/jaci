@@ -27,6 +27,8 @@ public:
 	static int fov;
 	static CBind key;
 	static aim_method_enum aim_method;
+	static float max_distance;
+	static float max_simulation_time;
 
 	static const char* GetName() { return "Aimbot"; };
 

@@ -20,7 +20,7 @@ public:
 	static void Gui();
 	static void GuiBackground(ImDrawList* draw);
 
-	static void Before_FrameStageNotify();
+	static void FrameStageNotify();
 
 	static void Reset();
 

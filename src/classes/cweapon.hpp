@@ -55,6 +55,7 @@ public:
 	bool get_projectile_info(ProjectileInfo_t& info);
 	bool is_melee();
 	bool can_hit_teammates();
+	bool is_sniper_rifle();
 };
 
 class CSniperRifle : public CWeapon
@@ -112,6 +113,7 @@ class CRevolver : public CWeapon
 {
 public:
 	bool can_headshot();
+	bool is_ambassador();
 };
 
 enum MinigunState_t

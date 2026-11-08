@@ -8,13 +8,13 @@ void* original_CHLClient_FrameStageNotify = nullptr;
 
 void CHLClient_FrameStageNotify(void* chlclient, int stage)
 {
-	if (stage == FRAME_NET_UPDATE_END)
-	{
-		CEntityList::Before_FrameStageNotify();
-		CBacktrack::Before_FrameStageNotify();
-		CEsp::Before_FrameStageNotify();
-	}
-
 	using OriginalFn = void(*)(void* chlclient, int stage);
 	((OriginalFn)original_CHLClient_FrameStageNotify)(chlclient, stage);
+
+	if (stage == FRAME_NET_UPDATE_END)
+	{
+		CEntityList::FrameStageNotify();
+		CBacktrack::FrameStageNotify();
+		CEsp::FrameStageNotify();
+	}
 }

@@ -21,6 +21,8 @@ CBind CAimbot::key = {};
 int CAimbot::fov = 0;
 int CAimbot::target_index = -1;
 aim_method_enum CAimbot::aim_method = aim_method_enum::plain;
+float CAimbot::max_distance = 2500.0f;
+float CAimbot::max_simulation_time = 5.0f;
 
 static bool can_run(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
 {

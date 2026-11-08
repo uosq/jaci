@@ -7,6 +7,13 @@
 #include "../../thirdparty/libsigscan/libsigscan.h"
 #include "../interfaces/interfaces.hpp"
 
+#include "../features/entitylist/entitylist.hpp"
+
+#include "ctfplayer.hpp"
+#include "cbaseobject.hpp"
+#include "crobot.hpp"
+#include "ctf_player_resource.hpp"
+
 void CBaseEntity::calc_abs_velocity()
 {
 	// xref: Main: %s, Cycle: %.2f\n
@@ -80,4 +87,64 @@ void CBaseEntity::set_abs_angles(const Vec3& angles)
 CBaseEntity* CBaseEntity::GetEntity(int entindex)
 {
 	return reinterpret_cast<CBaseEntity*>(g_cliententitylist->GetClientEntity(entindex));
+}
+
+bool CBaseEntity::is_alive()
+{
+	if ( IsDormant() )
+		return false;
+
+	if ( is_player() )
+		return reinterpret_cast<CPlayer*>(this)->is_alive();
+
+	if ( is_a_building() )
+		return reinterpret_cast<CBaseObject*>(this)->m_iHealth() > 0;
+
+	if ( is_tf_robot() )
+		return reinterpret_cast<CRobot*>(this)->m_iHealth() > 0;
+
+	return false;
+}
+
+int CBaseEntity::get_health()
+{
+	if (is_player())
+	{
+		return reinterpret_cast<CPlayer*>(this)->m_iHealth();
+	}
+
+	if (is_a_building())
+	{
+		return reinterpret_cast<CBaseObject*>(this)->m_iHealth();
+	}
+
+	if (is_tf_robot())
+	{
+		return reinterpret_cast<CRobot*>(this)->m_iHealth();
+	}
+
+	return 0;
+}
+
+int CBaseEntity::get_max_health()
+{
+	if (is_player())
+	{
+		if (auto* resource = CEntityList::GetPlayerResource(); resource)
+		{
+			return resource->m_iMaxHealth(entindex());
+		}
+	}
+
+	if (is_a_building())
+	{
+		return reinterpret_cast<CBaseObject*>(this)->m_iMaxHealth();
+	}
+
+	if (is_tf_robot())
+	{
+		return reinterpret_cast<CRobot*>(this)->m_iMaxHealth();
+	}
+
+	return 0;
 }

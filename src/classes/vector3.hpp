@@ -52,6 +52,11 @@ struct Vec3
 		return Vec3{x * other.x, y * other.y, z * other.z};
 	}
 
+	Vec3 operator-() const
+	{
+		return Vec3{-x, -y, z};
+	}
+
 	Vec3& operator*=(const float scalar)
 	{
 		x *= scalar;

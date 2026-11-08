@@ -92,14 +92,15 @@ public:
 	NETVAR(m_nWaterLevel, "CTFPlayer", "m_nWaterLevel", uint8_t)
 	NETVAR_ARRAY_LIMIT(m_iAmmo, "CBasePlayer", "m_iAmmo", int, TF_AMMO_COUNT)
 	NETVAR_ARRAY_LIMIT(m_flItemChargeMeter, "CTFPlayer", "m_flItemChargeMeter", float, LOADOUT_POSITION_MISC2 + 1)
+	NETVAR(m_angEyeAngles, "CTFPlayer", "m_angEyeAngles[0]", Vec3);
 
-	[[nodiscard]] std::string get_name() const;
-	[[nodiscard]] bool is_tf_bot() const;
-	[[nodiscard]] bool is_alive();
-	[[nodiscard]] Vec3 get_eye_pos();
-	[[nodiscard]] bool in_cond(int cond);
-	[[nodiscard]] bool is_taunting();
-	[[nodiscard]] bool is_ghost();
+	std::string get_name() const;
+	bool is_tf_bot() const;
+	bool is_alive();
+	Vec3 get_eye_pos();
+	bool in_cond(int cond);
+	bool is_taunting();
+	bool is_ghost();
 
 	CWeapon* GetWeapon();
 	const char* GetClassName();

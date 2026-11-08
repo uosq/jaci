@@ -17,8 +17,9 @@
 #include "../utils/utils.hpp"
 
 #include "../features/entitylist/entitylist.hpp"
-#include "../features/aimbot/aimbot.hpp"
+#include "../features/triggerbot/triggerbot.hpp"
 #include "../features/backtrack/backtrack.hpp"
+#include "../features/aimbot/aimbot.hpp"
 #include "../features/misc/misc.hpp"
 
 // yes, a global so I can modify it anywhere
@@ -39,6 +40,7 @@ static void CreateMove(const int sequence_number)
 		if (CWeapon* weapon = localplayer->GetWeapon(); weapon)
 		{
 			CAimbot::CreateMove(localplayer, weapon, cmd);
+			CTriggerBot::CreateMove(localplayer, weapon, cmd);
 			CBacktrack::CreateMove(localplayer, weapon, cmd);
 		}
 	}

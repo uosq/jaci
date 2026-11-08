@@ -113,9 +113,9 @@ static CPlayer* find_best_player(CPlayer* localplayer, const weapon_hit_point_en
 	return target;
 }
 
-static Vec3 predict_player(CPlayer* target, const Vec3& start_pos, const ProjectileInfo_t& projectile_info, const float required_time_seconds, const weapon_hit_point_enum hit_point)
+static Vec3 predict_player(CPlayer* target, const ProjectileInfo_t& projectile_info, const float required_time_seconds, const weapon_hit_point_enum hit_point)
 {
-	Vec3 predicted_pos = CPrediction::SimulatePlayer(start_pos, target, required_time_seconds);
+	Vec3 predicted_pos = CPrediction::SimulatePlayer(target, required_time_seconds);
 	predicted_pos.z += 2.0f;
 
 	if (hit_point == weapon_hit_point_enum::head)
@@ -131,6 +131,7 @@ static Vec3 predict_player(CPlayer* target, const Vec3& start_pos, const Project
 	return predicted_pos;
 }
 
+#if 0
 void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd)
 {
 	ProjectileInfo_t projectile_info;
@@ -159,7 +160,7 @@ void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd
 	Vec3 hit_position = target->GetAbsOrigin();
 
 	if (target->is_player())
-		hit_position = predict_player(reinterpret_cast<CPlayer*>(target), hit_position, projectile_info, required_time, hit_point);
+		hit_position = predict_player(reinterpret_cast<CPlayer*>(target), projectile_info, required_time, hit_point);
 
 	Vec3 angle = eye_pos.AngleTo(hit_position);
 
@@ -214,3 +215,5 @@ void CAimbot::AimProjectile(CPlayer* localplayer, CWeapon* weapon, CUserCmd* cmd
 
 	CAimbot::target_index = target->entindex();
 }
+
+#endif

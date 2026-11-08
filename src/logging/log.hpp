@@ -3,12 +3,13 @@
 
 #include <chrono>
 #include <vector>
+#include <string_view>
 
 //#define LOG(fmt, ...) std::fprintf(stderr, "'%s' at line '%i' " fmt "\n", __extension__ __PRETTY_FUNCTION__, __builtin_LINE(), ## __VA_ARGS__)
 
 struct log_info
 {
-	log_info(const std::string& text);
+	log_info(const std::string_view& text);
 
 	uint32_t id;
 	std::string message;

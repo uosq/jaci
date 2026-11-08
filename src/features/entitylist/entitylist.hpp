@@ -5,10 +5,11 @@
 #ifndef JACI_ENTITYLIST_HPP
 #define JACI_ENTITYLIST_HPP
 
-#include <span>
+#include <array>
 
 class CBaseEntity;
 class CPlayer;
+class CPlayerResource;
 
 constexpr int MAX_PLAYERS = 100; // max player count, would probably be 32 or 24 before the 100 player update
 
@@ -21,11 +22,12 @@ constexpr int MAX_BUILDINGS_TOTAL = MAX_PLAYERS * MAX_BUILDINGS_PER_PLAYER;
 class CEntityList
 {
 public:
-	static void Before_FrameStageNotify();
-
-	static std::span<CPlayer*> GetPlayers();
-	static CPlayer* GetLocalPlayer();
+	static void FrameStageNotify();
 	static void Reset();
+
+	static std::array<CPlayer*, MAX_PLAYERS>& GetPlayers();
+	static CPlayer* GetLocalPlayer();
+	static CPlayerResource* GetPlayerResource();
 };
 
 #endif //JACI_ENTITYLIST_HPP

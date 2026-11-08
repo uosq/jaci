@@ -9,6 +9,7 @@
 #include "features/hookmanager/hookmanager.hpp"
 
 #include "features/prediction/prediction.hpp"
+#include "features/triggerbot/triggerbot.hpp"
 #include "netvars/netvars.hpp"
 #include "logging/log.hpp"
 
@@ -80,6 +81,7 @@ static void init()
 
 	CGui::Initialize();
 	CAimbot::Initialize();
+	CTriggerBot::Initialize();
 	CConfigManager::Initialize();
 	CPrediction::InitProjectileSim();
 	CHookManager::Initialize();

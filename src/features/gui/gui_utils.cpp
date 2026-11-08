@@ -65,6 +65,19 @@ bool gui::slider(const char* text, int* value, const int min, const int max, con
 	return ret;
 }
 
+bool gui::slider(const char* text, float* value, const float min, const float max, const char* tooltip)
+{
+	bool ret = ImGui::SliderFloat(text, value, min, max);
+
+	if (tooltip && ImGui::IsItemHovered())
+		ImGui::SetTooltip("%s", tooltip);
+
+	if (ret)
+		make_log(std::format("Changed slider '{}' to value '{}'", text, *value));
+
+	return ret;
+}
+
 void gui::section(const char* id, std::function<void()> content)
 {
 	ImGui::PushID(id);

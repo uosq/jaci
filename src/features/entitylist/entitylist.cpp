@@ -10,9 +10,6 @@
 
 #include "../../interfaces/interfaces.hpp"
 
-#include <span>
-#include <array>
-
 static CPlayer* localplayer_entity = nullptr;
 static CPlayerResource* player_resource = nullptr;
 static std::array<CPlayer*, MAX_PLAYERS> players;
@@ -40,7 +37,7 @@ static void find_localplayer_entity()
 	}
 }
 
-void CEntityList::Before_FrameStageNotify()
+void CEntityList::FrameStageNotify()
 {
 	Reset();
 
@@ -71,9 +68,9 @@ void CEntityList::Before_FrameStageNotify()
 	find_localplayer_entity();
 }
 
-std::span<CPlayer*> CEntityList::GetPlayers()
+std::array<CPlayer*, MAX_PLAYERS>& CEntityList::GetPlayers()
 {
-	return {players.data(), player_count};
+	return players;
 }
 
 CPlayer* CEntityList::GetLocalPlayer()
@@ -88,4 +85,9 @@ void CEntityList::Reset()
 
 	player_count = 0;
 	players.fill(nullptr);
+}
+
+CPlayerResource* CEntityList::GetPlayerResource()
+{
+	return player_resource;
 }

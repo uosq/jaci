@@ -1,14 +1,14 @@
 #include "utils.hpp"
 
 #include "../../thirdparty/libsigscan/libsigscan.h"
+
 #include "../classes/ctfplayer.hpp"
 #include "../classes/cusercmd.hpp"
 #include "../classes/defs.hpp"
-
-#include "../interfaces/interfaces.hpp"
-
 #include "../classes/ctrace.hpp"
 #include "../classes/host.hpp"
+
+#include "../interfaces/interfaces.hpp"
 
 CPlayer* utils::get_localplayer()
 {

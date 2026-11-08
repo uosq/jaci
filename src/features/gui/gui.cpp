@@ -14,10 +14,11 @@
 
 #include "gui_utils.hpp"
 
-#include "../../features/aimbot/aimbot.hpp"
-#include "../../features/esp/esp.hpp"
+#include "../../features/triggerbot/triggerbot.hpp"
 #include "../../features/backtrack/backtrack.hpp"
+#include "../../features/aimbot/aimbot.hpp"
 #include "../../features/misc/misc.hpp"
+#include "../../features/esp/esp.hpp"
 
 #include "gui.hpp"
 
@@ -54,17 +55,10 @@ static void draw_main_window()
 		{
 			gui::tab("Main", []()
 			{
-				ImGui::PushID("Aimbot");
-				gui::separatortext("Aimbot"); CAimbot::Gui();
-				ImGui::PopID();
-
-				ImGui::PushID("Backtrack");
-				gui::separatortext("Backtrack"); CBacktrack::Gui();
-				ImGui::PopID();
-
-				ImGui::PushID("Misc");
-				gui::separatortext("Misc"); CMisc::Gui();
-				ImGui::PopID();
+				gui::section("Aimbot", CAimbot::Gui);
+				gui::section("Backtrack", CBacktrack::Gui);
+				gui::section("Misc", CMisc::Gui);
+				gui::section("TriggerBot", CTriggerBot::Gui);
 			});
 		});
 	});

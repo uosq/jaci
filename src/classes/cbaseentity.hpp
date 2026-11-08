@@ -25,22 +25,22 @@ public:
 
 	static CBaseEntity* GetEntity(int entindex);
 
-	__always_inline bool is_player()
+	bool is_player()
 	{
 		return GetClassID() == ETFClassID::CTFPlayer;
 	}
 
-	__always_inline Vec3 get_center()
+	Vec3 get_center()
 	{
 		return GetAbsOrigin() + ((m_vecMaxs() + m_vecMins()) * 0.5f);
 	}
 
-	__always_inline bool is_tf_robot()
+	bool is_tf_robot()
 	{
 		return GetClassID() == ETFClassID::CTFRobotDestruction_Robot;
 	}
 
-	__always_inline bool is_a_building()
+	bool is_a_building()
 	{
 		switch(GetClassID())
 		{
@@ -59,4 +59,8 @@ public:
 	
 	void set_abs_origin(const Vec3& origin);
 	void set_abs_angles(const Vec3& angles);
+
+	bool is_alive();
+	int get_health();
+	int get_max_health();
 };

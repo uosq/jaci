@@ -44,7 +44,7 @@ public:
 	static void Gui();
 
 	// call before FrameStageNotify
-	static void Before_FrameStageNotify();
+	static void FrameStageNotify();
 
 	static void Store();
 

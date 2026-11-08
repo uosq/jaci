@@ -53,4 +53,3 @@ project "Jaci"
 	removebuildoptions { "-Wall", "-Wextra" } -- remove global build options as I can't control thirparty libraries to follow -Wall and -Wextra
 
 	filter {} -- reset filter
----

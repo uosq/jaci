@@ -316,7 +316,7 @@ void CBacktrack::Gui()
 	gui::slider("Max Ticks", &CBacktrack::max_ticks, 0, 14);
 }
 
-void CBacktrack::Before_FrameStageNotify()
+void CBacktrack::FrameStageNotify()
 {
 	Store();
 }

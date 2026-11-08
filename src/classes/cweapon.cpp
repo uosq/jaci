@@ -411,11 +411,15 @@ bool CDragonFury::can_dragon_secondary_attack()
 	return ammo >= ammo_per_shot;
 }
 
-bool CRevolver::can_headshot()
+bool CRevolver::is_ambassador()
 {
 	const int mode = static_cast<int>(utils::attribute_hook_value(0, "set_weapon_mode", this));
-	const bool is_ambassador = mode == 1;
-	return is_ambassador && (g_globalvars->curtime - m_flLastFireTime()) > 1.0f;
+	return mode == 1;
+}
+
+bool CRevolver::can_headshot()
+{
+	return is_ambassador() && (g_globalvars->curtime - m_flLastFireTime()) > 1.0f;
 }
 
 bool CWeapon::can_hit_teammates()
@@ -449,4 +453,10 @@ bool CWeapon::can_hit_teammates()
 
 	static ConVar* mp_friendlyfire = g_enginecvar->FindVar("mp_friendlyfire");
 	return mp_friendlyfire ? mp_friendlyfire->GetBool() : false;
+}
+
+bool CWeapon::is_sniper_rifle()
+{
+	int id = get_weapon_id();
+	return id == TF_WEAPON_SNIPERRIFLE || id == TF_WEAPON_SNIPERRIFLE_CLASSIC || id == TF_WEAPON_SNIPERRIFLE_DECAP;
 }

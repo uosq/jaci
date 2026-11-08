@@ -25,7 +25,8 @@ struct projectile_sim_info
 class CPrediction
 {
 public:
-	static Vec3 SimulatePlayer(const Vec3& start_pos, CPlayer* player, float seconds);
+	static Vec3 SimulatePlayer(CPlayer* player, float seconds);
+	static Vec3 SimulateFakePlayer(CPlayer* player, const Vec3& start_pos, const Vec3& start_velocity, float seconds);
 
 	static void InitProjectileSim();
 	static bool SimulateProjectile(projectile_sim_info& info);

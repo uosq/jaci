@@ -155,7 +155,7 @@ static void end_prediction()
 	m_bIsOnGround	     = false;
 	m_bIsStarted	     = false;
 
-	m_filter.skip.clear();
+	m_filter.skip.fill(nullptr);
 }
 
 static bool simulate(Vec3& out)
@@ -893,11 +893,24 @@ static void air_move()
 	m_vecVelocity -= m_vecBaseVelocity;
 }
 
-Vec3 CPrediction::SimulatePlayer(const Vec3& start_pos, CPlayer* player, float seconds)
+Vec3 CPrediction::SimulatePlayer(CPlayer* player, float seconds)
 {
-	Vec3 end_pos = start_pos;
+	Vec3 end_pos = Vec3{};
 
 	begin_prediction(player, seconds);
+	simulate(end_pos);
+	end_prediction();
+
+	return end_pos;
+}
+
+Vec3 CPrediction::SimulateFakePlayer(CPlayer* player, const Vec3& start_pos, const Vec3& start_velocity, float seconds)
+{
+	Vec3 end_pos = Vec3{};
+
+	begin_prediction(player, seconds);
+	m_vecVelocity = start_velocity;
+	m_vecAbsOrigin = start_pos;
 	simulate(end_pos);
 	end_prediction();
 

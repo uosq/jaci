@@ -18,7 +18,7 @@ public:
 	bool ShouldHitEntity(IHandleEntity* handle_entity, int contents_mask) override;
 	TraceType_t GetTraceType() const override;
 
-	std::vector<CBaseEntity*> skip;
+	std::array<CBaseEntity*, 2> skip { nullptr, nullptr }; // usually localplayer and/or target
 	int team { -1 }; // -1 is every team, anything else, and it will only search for entities in that team
 };
 
@@ -40,7 +40,7 @@ public:
 	bool ShouldHitEntity(IHandleEntity* handle_entity, int contents_mask) override;
 	TraceType_t GetTraceType() const override { return TRACE_EVERYTHING; };
 
-	std::vector<CBaseEntity*> skip;
+	std::array<CBaseEntity*, 2> skip { nullptr, nullptr };
 };
 
 #endif //GUARACI_TRACEFILTERS_HPP
